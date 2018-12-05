@@ -1,10 +1,74 @@
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+button,
+input {
+    outline: none;
+}
+
 .background {
     position: fixed;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
-    background-color: skyblue;
     background-repeat: no-repeat;
     background-size: cover;
+    z-index: -1;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.daily-sentence {
+    margin-top: 50px;
+    width: 460px;
+    padding: 5px;
+    font-size: 20px;
+    text-shadow: 0 0 5px rgba(24, 144, 255, .5);
+    text-align: center;
+    color: #333;
+    background-color: rgba(255, 255, 255, .3);
+}
+
+.search-wrapper {
+    display: flex;
+    margin-top: 10px;
+}
+
+.search-wrapper .keywords {
+    width: 380px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #1890ff;
+    background-color: transparent;
+    transition: all .3s;
+}
+
+.search-wrapper .keywords:focus {
+    box-shadow: 0 0 5px 0 rgba(24, 144, 255, .8);
+}
+
+.search-wrapper .search {
+    width: 80px;
+    height: 36px;
+    margin-left: -1px;
+    border: none;
+    background: #1890ff url(../images/search.svg) no-repeat center center/20px 20px;
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.search-wrapper .search:hover {
+    background-color: #40a9ff;
+}
+
+.search-wrapper .search:active {
+    background-color: #096dd9;
 }

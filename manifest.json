@@ -29,11 +29,20 @@
     "storage",
     "webRequest",
     "contextMenus",
-    "topSites",
-    "http://*/*", // 可以通过executeScript或者允许跨域的网站
-    "https://*/*" // 可以通过executeScript或者允许跨域的网站
+    "sessions"
   ],
   "chrome_url_overrides": {
     "newtab": "newTab.html"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "js": ["js/gesture.js"],
+      "css": ["css/gesture.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "options_page": "options.html",
+  "web_accessible_resources": ["images/*"]
 }
