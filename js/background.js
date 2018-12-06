@@ -46,12 +46,17 @@ function switchTab(dir) {
 
 function handleMessage(message, sender, sendResponse) {
     switch(message) {
-        case "dr":
+        case "dr": //关闭标签
             chrome.tabs.query({
                 active: true,
                 currentWindow: true
             }, tabs => {
                chrome.tabs.remove(tabs[0].id);
+            });
+            break;
+        case "dl": //新建标签
+            chrome.tabs.create({
+                active: true
             });
             break;
         case "lu"://重新打开关闭的标签或者窗口

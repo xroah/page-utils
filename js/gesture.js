@@ -16,6 +16,7 @@ let gesture = {
         for (let key in attributes) {
             el.setAttribute(key, attributes[key]);
         }
+        return this;
     },
     getLastDir() {
         let dirs = this.dirs;
@@ -26,6 +27,10 @@ let gesture = {
         return ns ? doc.createElementNS(ns, str) : doc.createElement(str);
     },
     handleMouseDown(evt) {
+        this.preventContextMenu = false;
+        if (this.wrapper) {
+            document.body.removeChild(this.wrapper);
+        }
         if (evt.button !== 2) return; //按下的不是鼠标右键
         let pos = this.lastPosition;
         let div = this.wrapper = this.createEl("div");
@@ -51,22 +56,26 @@ let gesture = {
         div.appendChild(svg);
         document.body.appendChild(div);
         this.mouseDown = true;
-        this.preventContextMenu = false;
         if (this.moveTimer) {
             clearInterval(this.moveTimer);
             this.moveTimer = null;
         }
     },
-    handleMouseUp(evt) {
-        if (evt.button !== 2) return;
-        this.execute();
-        document.body.removeChild(this.wrapper);
+    reset() {
+        if (this.wrapper) {
+            document.body.removeChild(this.wrapper);
+        }
         this.mouseDown = false;
         this.wrapper = null;
         this.svgTag = null;
         this.polyline = null;
         this.positions = [];
         this.dirs = [];
+        return this;
+    },
+    handleMouseUp(evt) {
+        if (evt.button !== 2 || !this.mouseDown) return;
+        this.execute().reset();
     },
     updateDirView(dir) {
         let div = this.wrapper.querySelector(".dir-wrapper");
@@ -85,6 +94,7 @@ let gesture = {
             d: "向下滚动",
             u: "向上滚动",
             dr: "关闭标签",
+            dl: "新建标签",
             lu: "重新打开",
             rd: "到底部",
             ru: "到顶部",
@@ -112,6 +122,7 @@ let gesture = {
         }
         imgWrapper.appendChild(img);
         textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
+        return this;
     },
     scrollPage(dis) {
         let moved = 0;
@@ -129,6 +140,7 @@ let gesture = {
                 this.moveTimer = null;
             }
         }, 20);
+        return this;
     },
     execute() {
         let dirs = this.dirs.join("");
@@ -163,6 +175,7 @@ let gesture = {
             default: //其他需要调用chrome api的操作
                 chrome.runtime.sendMessage(dirs);
         }
+        return this;
     },
     handleMouseMove(evt) {
         if (!this.mouseDown) return;
@@ -194,12 +207,19 @@ let gesture = {
             evt.preventDefault();
         }
     },
+    handleKeyEvent(evt) {
+        let key = evt.key.toLowerCase();
+        if (key === "escape") {
+            this.reset();
+        }
+    },
     initEvent() {
         let doc = document;
         doc.addEventListener("mousedown", this.handleMouseDown.bind(this));
         doc.addEventListener("mouseup", this.handleMouseUp.bind(this));
         doc.addEventListener("mousemove", this.handleMouseMove.bind(this));
-        doc.addEventListener("contextmenu", this.handleContextMenu.bind(this))
+        doc.addEventListener("contextmenu", this.handleContextMenu.bind(this));
+        doc.addEventListener("keydown", this.handleKeyEvent.bind(this))
     },
     init() {
         this.initEvent();
