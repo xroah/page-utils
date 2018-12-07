@@ -44,14 +44,23 @@ function switchTab(dir) {
     });
 }
 
-function handleMessage(message, sender, sendResponse) {
+function handleMessage(evt, sender, sendResponse) {
+    switch(evt.type) {
+        case "executeGesture":
+            executeGesture(evt.message);
+            break;
+    }
+    sendResponse();
+}
+
+function executeGesture(message) {
     switch(message) {
         case "dr": //关闭标签
             chrome.tabs.query({
                 active: true,
                 currentWindow: true
             }, tabs => {
-               chrome.tabs.remove(tabs[0].id);
+                chrome.tabs.remove(tabs[0].id);
             });
             break;
         case "dl": //新建标签
@@ -73,11 +82,20 @@ function handleMessage(message, sender, sendResponse) {
             break;
         case "urd": //关闭窗口
             chrome.windows.getCurrent(window => {
-               chrome.windows.remove(window.id);
+                chrome.windows.remove(window.id);
             });
             break;
     }
-    sendResponse();
 }
 
 chrome.runtime.onMessage.addListener(handleMessage);
+chrome.tabs.onCreated.addListener(function(tab) {
+    if (tab.url === "chrome://newtab/") {
+        /*chrome.tabs.update(
+            tab.id,
+            {
+                url: chrome.runtime.getURL("") + "newTab.html"
+            }
+        );*/
+    }
+});

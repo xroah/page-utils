@@ -173,7 +173,7 @@ let gesture = {
                 this.scrollPage(-document.body.scrollHeight);
                 break;
             default: //其他需要调用chrome api的操作
-                chrome.runtime.sendMessage(dirs);
+                chrome.runtime.sendMessage({type: "executeGesture", message: dirs});
         }
         return this;
     },
@@ -186,9 +186,9 @@ let gesture = {
         let my = Math.abs(y - pos.y);
         let dis = Math.sqrt(Math.pow(mx, 2) + Math.pow(my, 2));
         let dir;
+        this.positions.push(`${x} ${y}`);
+        this.polyline.setAttribute("points", this.positions.join(", "));
         if (dis > MIN_DISTANCE) {
-            this.positions.push(`${x} ${y}`);
-            this.polyline.setAttribute("points", this.positions.join(", "));
             if (mx > my) {
                 dir = x > pos.x ? "r" : "l";
             } else {
@@ -215,13 +215,18 @@ let gesture = {
     },
     initEvent() {
         let doc = document;
-        doc.addEventListener("mousedown", this.handleMouseDown.bind(this));
-        doc.addEventListener("mouseup", this.handleMouseUp.bind(this));
-        doc.addEventListener("mousemove", this.handleMouseMove.bind(this));
-        doc.addEventListener("contextmenu", this.handleContextMenu.bind(this));
-        doc.addEventListener("keydown", this.handleKeyEvent.bind(this))
+        doc.addEventListener("mousedown", this._handleMouseDown);
+        doc.addEventListener("mouseup", this._handleMouseUp);
+        doc.addEventListener("mousemove", this._handleMouseMove);
+        doc.addEventListener("contextmenu", this._handleContextMenu);
+        doc.addEventListener("keydown", this._handleKeyEvent);
     },
     init() {
+        this._handleMouseDown = this.handleMouseDown.bind(this);
+        this._handleMouseUp = this.handleMouseUp.bind(this);
+        this._handleMouseMove = this.handleMouseMove.bind(this);
+        this._handleContextMenu = this.handleContextMenu.bind(this);
+        this._handleKeyEvent = this.handleKeyEvent.bind(this);
         this.initEvent();
     }
 };

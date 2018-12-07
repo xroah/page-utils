@@ -32,7 +32,7 @@
     "sessions"
   ],
   "chrome_url_overrides": {
-    "newtab": "newTab.html"
+    //"newtab": "newTab.html"
   },
   "content_scripts": [
     {

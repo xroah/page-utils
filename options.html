@@ -3,8 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>设置</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/options.css">
 </head>
 <body>
-11111
+<header class="header">
+    <span id="title">设置</span>
+</header>
+<aside class="aside" id="aside">
+    <p>设置</p>
+    <button type="button" class="show-menu-btn" id="showMenuBtn">
+        <span class="icon"></span>
+    </button>
+    <ul class="nav" id="nav">
+        <li>
+            <a href="#/basic" class="router-link">基本设置</a>
+        </li>
+        <li>
+            <a href="#/gesture" class="router-link">手势设置</a>
+        </li>
+        <li>
+            <a href="#/about" class="router-link">关于</a>
+        </li>
+    </ul>
+</aside>
+<section class="container">
+    <section class="main-content">
+        <div id="basic" class="hidden view">
+            <div class="row">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input">
+                    <span class="checkbox-replace"></span>
+                    <span class="checkbox-text">替换新标签页</span>
+                </label>
+            </div>
+            <div class="row">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input">
+                    <span class="checkbox-replace"></span>
+                    <span class="checkbox-text">开启鼠标手势</span>
+                </label>
+            </div>
+        </div>
+        <div id="gesture" class="hidden view">
+            手势设置
+        </div>
+        <div id="about" class="hidden view">
+            关于
+        </div>
+    </section>
+</section>
+<script src="js/options.js"></script>
 </body>
 </html>

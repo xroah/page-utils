@@ -1,0 +1,137 @@
+body {
+    overflow: hidden;
+}
+
+.header {
+    position: relative;
+    height: 50px;
+    line-height: 50px;
+    background-color: #1998ff;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.container {
+    width: 1000px;
+    height: 100vh;
+    margin: 0 auto;
+}
+
+.row {
+    margin: 10px 0;
+}
+
+.show-menu-btn {
+    position: absolute;
+    top: 25px;
+    right: -50px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    transition: all .3s;
+    cursor: pointer;
+}
+
+.show-menu-btn:active {
+    background-color: rgba(255, 255, 255, .3);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, .3);
+}
+
+.show-menu-btn .icon {
+    display: inline-block;
+    position: relative;
+    width: 20px;
+    height: 2px;
+    transform: translateY(-50%);
+    vertical-align: middle;
+    background-color: #fff;
+    transition: all .3s;
+}
+
+.show-menu-btn .icon::before,
+.show-menu-btn .icon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: inherit;
+    height: inherit;
+    background-color: inherit;
+    transition: all .3s;
+}
+
+.show-menu-btn .icon::before {
+    top: -6px;
+}
+
+.show-menu-btn .icon::after {
+    top: 6px;
+}
+
+.show-menu-btn.active .icon::after {
+    transform: rotate(90deg) translateX(-27%)
+}
+
+.show-menu-btn.active .icon {
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.show-menu-btn.active .icon::before {
+    opacity: 0;
+}
+
+.aside {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 200px;
+    background-color: #324057;
+    color: #bfcbd9;
+    transform: translateX(-100%);
+    transition: all .3s;
+}
+
+.aside.visible {
+    transform: translateX(0);
+    box-shadow: 1px 0 5px 3px rgba(0, 0, 0, .5);
+}
+
+.aside > p:first-child {
+    line-height: 50px;
+    padding-left: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.nav li a {
+    display: inline-block;
+    padding-left: 15px;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    font-size: 16px;
+    color: #bfcbd9;
+}
+.nav li.active a {
+    background-color: #1998ff;
+    color: #fff;
+}
+
+
+.main-content {
+    padding: 10px;
+}
+
+@media screen and (max-width: 1000px) {
+    .container {
+        width: 100%;
+    }
+}
