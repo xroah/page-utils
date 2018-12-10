@@ -5,10 +5,43 @@ function showMenu(evt) {
     aside.classList.toggle("visible");
 }
 
+function handleChange(evt) {
+    let target = evt.target;
+    if (target.nodeName.toLowerCase() !== "input") return;
+    let checked = target.checked;
+    getOptions().then(opts => {
+        switch (target.id) {
+            case "disable":
+                opts.normal.disabled = !checked;
+                break;
+            case "replaceNewTab":
+                opts.normal.replaceNewTab = checked;
+                break;
+            case "enableGesture":
+                opts.normal.enableGesture = checked;
+                break;
+        }
+        setOptions(opts);
+    });
+}
+
+function getOptions() {
+    return new Promise(resolve => {
+        chrome.storage.sync.get("options", obj => resolve(obj.options));
+    });
+}
+
+function setOptions(options) {
+    chrome.storage.sync.set({
+        options
+    });
+}
+
 function initEvent() {
     let showMenuBtn = document.getElementById("showMenuBtn");
     showMenuBtn.addEventListener("click", showMenu);
     window.addEventListener("hashchange", handleHashChange);
+    document.addEventListener("change", handleChange);
 }
 
 function handleHashChange() {
@@ -53,7 +86,20 @@ function updateView(hash = location.hash) {
     }
 }
 
+function initSettings() {
+    chrome.storage.sync.get("options", obj => {
+        let options = obj.options;
+        let disable = document.getElementById("disable");
+        let replaceNewTab = document.getElementById("replaceNewTab");
+        let enableGesture = document.getElementById("enableGesture");
+        disable.checked = !options.normal.disabled;
+        replaceNewTab.checked = options.normal.replaceNewTab;
+        enableGesture.checked = options.normal.enableGesture;
+    });
+}
+
 function init() {
+    initSettings();
     initEvent();
     updateView();
 }

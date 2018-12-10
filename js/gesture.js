@@ -12,6 +12,10 @@ let gesture = {
     positions: [],
     dirs: [],
     moveTimer: null,
+    showTrack: true, //是否显示轨迹
+    showDir: true, //是否显示方向
+    showHint: true, //是否显示提示
+    disabled: false, //是否禁用
     setAttributes(el, attributes) {
         for (let key in attributes) {
             el.setAttribute(key, attributes[key]);
@@ -33,29 +37,11 @@ let gesture = {
         }
         if (evt.button !== 2) return; //按下的不是鼠标右键
         let pos = this.lastPosition;
-        let div = this.wrapper = this.createEl("div");
-        let svgNS = "http://www.w3.org/2000/svg";
-        let svg = this.svgTag = this.createEl("svg", svgNS);
-        let polyline = this.polyline = this.createEl("polyline", svgNS);
         pos.x = evt.clientX;
         pos.y = evt.clientY;
         this.positions.push(`${pos.x} ${pos.y}`);
-        div.classList.add("bgoiofgfpkhhhlndnfhaplljgjajnell-gesture-wrapper");
-        this.setAttributes(svg, {
-            width: window.innerWidth,
-            height: window.innerHeight
-        });
-        this.setAttributes(polyline, {
-            "points": this.positions.join(", "),
-            "stroke": "skyblue",
-            "stroke-width": "5",
-            "stroke-linejoin": "round",
-            "fill": "transparent"
-        });
-        svg.appendChild(polyline);
-        div.appendChild(svg);
-        document.body.appendChild(div);
         this.mouseDown = true;
+        this.initView();
         if (this.moveTimer) {
             clearInterval(this.moveTimer);
             this.moveTimer = null;
@@ -77,51 +63,77 @@ let gesture = {
         if (evt.button !== 2 || !this.mouseDown) return;
         this.execute().reset();
     },
-    updateDirView(dir) {
-        let div = this.wrapper.querySelector(".dir-wrapper");
-        let imgWrapper;
-        let textWrapper;
-        let img = new Image();
-        let dirMap = {
-            u: "images/a_up.png",
-            r: "images/a_right.png",
-            d: "images/a_down.png",
-            l: "images/a_left.png"
-        };
-        let dirTextMap = {
-            l: "后退",
-            r: "前进",
-            d: "向下滚动",
-            u: "向上滚动",
-            dr: "关闭标签",
-            dl: "新建标签",
-            lu: "重新打开",
-            rd: "到底部",
-            ru: "到顶部",
-            ul: "左侧标签",
-            ur: "右侧标签",
-            ud: "刷新",
-            udu: "强制刷新",
-            dru: "新建窗口",
-            urd: "关闭窗口"
-        };
-        img.src = chrome.runtime.getURL("") + dirMap[dir];
-        if (!div) {
-            div = this.createEl("div");
-            imgWrapper = this.createEl("div");
-            textWrapper = this.createEl("div");
-            imgWrapper.classList.add("img-wrapper");
-            textWrapper.classList.add("text-wrapper");
-            div.classList.add("dir-wrapper");
-            div.appendChild(imgWrapper);
-            div.appendChild(textWrapper);
-            this.wrapper.appendChild(div);
-        } else {
-            imgWrapper = div.querySelector(".img-wrapper");
-            textWrapper = div.querySelector(".text-wrapper");
+    initView() {
+        let div = this.wrapper = this.createEl("div");
+        let hintWrapper = this.createEl("div");
+        div.classList.add("bgoiofgfpkhhhlndnfhaplljgjajnell-gesture-wrapper");
+        hintWrapper.classList.add("hint-wrapper");
+        if (this.showTrack) {
+            let svgNS = "http://www.w3.org/2000/svg";
+            let polyline = this.polyline = this.createEl("polyline", svgNS);
+            let svg = this.svgTag = this.createEl("svg", svgNS);
+            this.setAttributes(svg, {
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+            this.setAttributes(polyline, {
+                "points": this.positions.join(", "),
+                "stroke": "skyblue",
+                "stroke-width": "5",
+                "stroke-linejoin": "round",
+                "fill": "transparent"
+            });
+            svg.appendChild(polyline);
+            div.appendChild(svg);
         }
-        imgWrapper.appendChild(img);
-        textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
+        if (this.showDir) {
+            let imgWrapper = this.createEl("div");
+            imgWrapper.classList.add("dir-wrapper");
+            hintWrapper.appendChild(imgWrapper);
+        }
+        if (this.showHint) {
+            let textWrapper = this.createEl("div");
+            textWrapper.classList.add("text-wrapper");
+            hintWrapper.appendChild(textWrapper);
+        }
+        div.appendChild(hintWrapper);
+        document.body.appendChild(div);
+    },
+    updateDirView(dir) {
+        if (!this.showHint && !this.showDir) return;
+        let dirWrapper = this.wrapper.querySelector(".dir-wrapper");
+        let textWrapper = this.wrapper.querySelector(".text-wrapper");
+        if (dirWrapper) {
+            let dirMap = {
+                u: "images/a_up.png",
+                r: "images/a_right.png",
+                d: "images/a_down.png",
+                l: "images/a_left.png"
+            };
+            let img = new Image();
+            img.src = chrome.runtime.getURL("") + dirMap[dir];
+            dirWrapper.appendChild(img);
+        }
+        if (textWrapper) {
+            let dirTextMap = {
+                l: "后退",
+                r: "前进",
+                d: "向下滚动",
+                u: "向上滚动",
+                dr: "关闭标签",
+                dl: "新建标签",
+                lu: "重新打开",
+                rd: "到底部",
+                ru: "到顶部",
+                ul: "左侧标签",
+                ur: "右侧标签",
+                ud: "刷新",
+                udu: "强制刷新",
+                dru: "新建窗口",
+                urd: "关闭窗口"
+            };
+            textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
+        }
         return this;
     },
     scrollPage(dis) {
@@ -186,8 +198,10 @@ let gesture = {
         let my = Math.abs(y - pos.y);
         let dis = Math.sqrt(Math.pow(mx, 2) + Math.pow(my, 2));
         let dir;
-        this.positions.push(`${x} ${y}`);
-        this.polyline.setAttribute("points", this.positions.join(", "));
+        if (this.showTrack) {
+            this.positions.push(`${x} ${y}`);
+            this.polyline.setAttribute("points", this.positions.join(", "));
+        }
         if (dis > MIN_DISTANCE) {
             if (mx > my) {
                 dir = x > pos.x ? "r" : "l";
@@ -213,6 +227,15 @@ let gesture = {
             this.reset();
         }
     },
+    handleStorageChange(obj) {
+        let { normal } = obj.options.newValue;
+        console.log(normal)
+        if (normal.disabled || !normal.enableGesture) {
+            this.removeEvent();
+        } else {
+            this.initEvent();
+        }
+    },
     initEvent() {
         let doc = document;
         doc.addEventListener("mousedown", this._handleMouseDown);
@@ -221,13 +244,31 @@ let gesture = {
         doc.addEventListener("contextmenu", this._handleContextMenu);
         doc.addEventListener("keydown", this._handleKeyEvent);
     },
+    removeEvent() {
+        let doc = document;
+        doc.removeEventListener("mousedown", this._handleMouseDown);
+        doc.removeEventListener("mouseup", this._handleMouseUp);
+        doc.removeEventListener("mousemove", this._handleMouseMove);
+        doc.removeEventListener("contextmenu", this._handleContextMenu);
+        doc.removeEventListener("keydown", this._handleKeyEvent);
+    },
+    initSettings() {
+        chrome.storage.sync.get("options", obj => {
+            let {normal} = obj.options;
+            if (!normal.disabled && normal.enableGesture) {
+                this.initEvent();
+            }
+            console.log(normal)
+        });
+    },
     init() {
         this._handleMouseDown = this.handleMouseDown.bind(this);
         this._handleMouseUp = this.handleMouseUp.bind(this);
         this._handleMouseMove = this.handleMouseMove.bind(this);
         this._handleContextMenu = this.handleContextMenu.bind(this);
         this._handleKeyEvent = this.handleKeyEvent.bind(this);
-        this.initEvent();
+        chrome.storage.onChanged.addListener(this.handleStorageChange.bind(this));
+        this.initSettings();
     }
 };
 

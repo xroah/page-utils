@@ -45,16 +45,15 @@ function switchTab(dir) {
 }
 
 function handleMessage(evt, sender, sendResponse) {
-    switch(evt.type) {
+    switch (evt.type) {
         case "executeGesture":
             executeGesture(evt.message);
             break;
     }
-    sendResponse();
 }
 
 function executeGesture(message) {
-    switch(message) {
+    switch (message) {
         case "dr": //关闭标签
             chrome.tabs.query({
                 active: true,
@@ -88,14 +87,42 @@ function executeGesture(message) {
     }
 }
 
-chrome.runtime.onMessage.addListener(handleMessage);
-chrome.tabs.onCreated.addListener(function(tab) {
+function replaceNewTab(tab) {
     if (tab.url === "chrome://newtab/") {
-        /*chrome.tabs.update(
-            tab.id,
-            {
-                url: chrome.runtime.getURL("") + "newTab.html"
+        chrome.storage.sync.get("options", obj => {
+            let {normal} = obj.options;
+            if (!normal.disabled && normal.replaceNewTab) {
+                chrome.tabs.update(
+                    tab.id,
+                    {
+                        url: chrome.runtime.getURL("") + "newTab.html"
+                    }
+                );
             }
-        );*/
+        });
+    }
+}
+
+chrome.runtime.onMessage.addListener(handleMessage);
+chrome.tabs.onCreated.addListener(replaceNewTab);
+chrome.tabs.onUpdated.addListener(function (tabId, tab) {
+    replaceNewTab(tab);
+});
+
+chrome.runtime.onInstalled.addListener(detail => {
+    if (detail.reason === "install") {
+        let defaultOptions = {
+            normal: {
+                disabled: false,
+                showTrack: true,
+                showDir: true,
+                showHint: true,
+                replaceNewTab: false,
+                enableGesture: true
+            }
+        };
+        chrome.storage.sync.set({
+            options: defaultOptions
+        });
     }
 });

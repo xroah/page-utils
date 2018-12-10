@@ -5,6 +5,7 @@
     <title>设置</title>
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/options.css">
+    <link rel="stylesheet" href="css/gesture.css">
 </head>
 <body>
 <header class="header">
@@ -31,15 +32,22 @@
     <section class="main-content">
         <div id="basic" class="hidden view">
             <div class="row">
+                <span class="font-bold">功能开启:</span>
+                <label class="switch-label">
+                    <input type="checkbox" class="checkbox-input" id="disable">
+                    <span class="switch-wrapper"></span>
+                </label>
+            </div>
+            <div class="row">
                 <label class="checkbox-label">
-                    <input type="checkbox" class="checkbox-input">
+                    <input type="checkbox" class="checkbox-input" id="replaceNewTab">
                     <span class="checkbox-replace"></span>
                     <span class="checkbox-text">替换新标签页</span>
                 </label>
             </div>
             <div class="row">
                 <label class="checkbox-label">
-                    <input type="checkbox" class="checkbox-input">
+                    <input type="checkbox" class="checkbox-input" id="enableGesture">
                     <span class="checkbox-replace"></span>
                     <span class="checkbox-text">开启鼠标手势</span>
                 </label>
@@ -54,5 +62,6 @@
     </section>
 </section>
 <script src="js/options.js"></script>
+<script src="js/gesture.js"></script>
 </body>
 </html>

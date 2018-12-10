@@ -96,11 +96,16 @@ body {
     color: #bfcbd9;
     transform: translateX(-100%);
     transition: all .3s;
+    z-index: 10;
 }
 
 .aside.visible {
     transform: translateX(0);
     box-shadow: 1px 0 5px 3px rgba(0, 0, 0, .5);
+}
+
+.aside.visible .show-menu-btn {
+    right: 10px;
 }
 
 .aside > p:first-child {
