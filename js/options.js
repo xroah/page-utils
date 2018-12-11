@@ -8,21 +8,30 @@ function showMenu(evt) {
 function handleChange(evt) {
     let target = evt.target;
     if (target.nodeName.toLowerCase() !== "input") return;
-    let checked = target.checked;
-    getOptions().then(opts => {
-        switch (target.id) {
-            case "disable":
-                opts.normal.disabled = !checked;
-                break;
-            case "replaceNewTab":
-                opts.normal.replaceNewTab = checked;
-                break;
-            case "enableGesture":
-                opts.normal.enableGesture = checked;
-                break;
+    if (target.type === "checkbox") {
+        let checked = target.checked;
+        let ref = target.getAttribute("data-ref");
+        if (ref) {
+            ref = getById(ref);
+            checked ? ref.classList.remove("hidden") : ref.classList.add("hidden");
         }
-        setOptions(opts);
-    });
+        getOptions().then(opts => {
+            if (target.id === "disable") {
+                opts.normal.disabled = !checked;
+            } else {
+                opts.normal[target.id] = checked;
+            }
+            setOptions(opts);
+        });
+    } else if (target.type === "range") {
+        let valueEl = target.nextElementSibling;
+        let value = target.value;
+        valueEl.innerHTML = value;
+        getOptions().then(opts => {
+            opts.normal[target.id] = +value;
+            setOptions(opts);
+        });
+    }
 }
 
 function getOptions() {
@@ -41,7 +50,7 @@ function initEvent() {
     let showMenuBtn = document.getElementById("showMenuBtn");
     showMenuBtn.addEventListener("click", showMenu);
     window.addEventListener("hashchange", handleHashChange);
-    document.addEventListener("change", handleChange);
+    document.body.addEventListener("change", handleChange);
 }
 
 function handleHashChange() {
@@ -86,15 +95,31 @@ function updateView(hash = location.hash) {
     }
 }
 
+function getById(id) {
+    return document.getElementById(id);
+}
+
 function initSettings() {
     chrome.storage.sync.get("options", obj => {
-        let options = obj.options;
-        let disable = document.getElementById("disable");
-        let replaceNewTab = document.getElementById("replaceNewTab");
-        let enableGesture = document.getElementById("enableGesture");
-        disable.checked = !options.normal.disabled;
-        replaceNewTab.checked = options.normal.replaceNewTab;
-        enableGesture.checked = options.normal.enableGesture;
+        let { normal } = obj.options;
+        let disable = getById("disable");
+        let replaceNewTab = getById("replaceNewTab");
+        let enableGesture = getById("enableGesture");
+        let expireCheckbox = getById("expire");
+        let expireSlider = getById("expireSlider");
+        let expireValue = expireSlider.querySelector(".range-value");
+        let expireSecond = getById("expireSecond");
+        let minDisInput = getById("minDis");
+        let minDisValue = getById("minDisValue");
+        disable.checked = !normal.disabled;
+        replaceNewTab.checked = normal.replaceNewTab;
+        enableGesture.checked = normal.enableGesture;
+        expireCheckbox.checked = normal.expire;
+        expireSecond.value = expireValue.innerHTML = normal.expireSecond;
+        minDisValue.innerHTML = minDisInput.value = normal.minDis;
+        if (!normal.expire) {
+            expireSlider.classList.add("hidden");
+        }
     });
 }
 

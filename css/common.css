@@ -136,6 +136,34 @@ input {
     transform: translateX(14px);
 }
 
+.range-slider {
+    height: 6px;
+    width: 150px;
+    border-radius: 6px;
+    -webkit-appearance: none;
+    background-color: #1890ff;
+    cursor: pointer;
+}
+
+.range-slider::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, .6);
+    background-color: #fff;
+    -webkit-appearance: none;
+}
+
+.range-value {
+    padding: 0 5px;
+    border: 1px solid #d9d9d9;
+    vertical-align: middle;
+}
+
+.transition {
+    transition: all .3s;
+}
+
 ::-webkit-scrollbar {
     width: 4px;
     border-radius: 10px;

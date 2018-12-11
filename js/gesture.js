@@ -1,4 +1,3 @@
-const MIN_DISTANCE = 10; //移动的最小距离 触发手势
 let gesture = {
     mouseDown: false,
     lastPosition: {
@@ -16,6 +15,10 @@ let gesture = {
     showDir: true, //是否显示方向
     showHint: true, //是否显示提示
     disabled: false, //是否禁用
+    minDis: 10, //手势生效的最小长度
+    expire: false, //是否超时取消
+    expireSecond: 2,//超时取消时间
+    cancelTimer: null,
     setAttributes(el, attributes) {
         for (let key in attributes) {
             el.setAttribute(key, attributes[key]);
@@ -61,7 +64,7 @@ let gesture = {
     },
     handleMouseUp(evt) {
         if (evt.button !== 2 || !this.mouseDown) return;
-        this.execute().reset();
+        this.execute().reset().clearCancelTimer();
     },
     initView() {
         let div = this.wrapper = this.createEl("div");
@@ -156,9 +159,8 @@ let gesture = {
     },
     execute() {
         let dirs = this.dirs.join("");
-        if (dirs) {
-            this.preventContextMenu = true;
-        }
+        if (!dirs) return this;
+        this.preventContextMenu = true;
         switch (dirs) {
             case "l": //后退
                 history.back();
@@ -189,6 +191,13 @@ let gesture = {
         }
         return this;
     },
+    clearCancelTimer() {
+        if (this.cancelTimer !== null) {
+            clearTimeout(this.cancelTimer);
+            this.cancelTimer = null;
+        }
+        return this;
+    },
     handleMouseMove(evt) {
         if (!this.mouseDown) return;
         let pos = this.lastPosition;
@@ -202,7 +211,11 @@ let gesture = {
             this.positions.push(`${x} ${y}`);
             this.polyline.setAttribute("points", this.positions.join(", "));
         }
-        if (dis > MIN_DISTANCE) {
+        if (this.expire) {
+            this.clearCancelTimer();
+            this.cancelTimer = setTimeout(this.reset.bind(this), this.expireSecond * 1000)
+        }
+        if (dis > this.minDis) {
             if (mx > my) {
                 dir = x > pos.x ? "r" : "l";
             } else {
@@ -228,29 +241,30 @@ let gesture = {
         }
     },
     handleStorageChange(obj) {
+        console.log(obj)
         let { normal } = obj.options.newValue;
-        console.log(normal)
         if (normal.disabled || !normal.enableGesture) {
-            this.removeEvent();
+            this.removeEvent()
         } else {
             this.initEvent();
         }
+        this.updateProp(normal);
     },
     initEvent() {
         let doc = document;
-        doc.addEventListener("mousedown", this._handleMouseDown);
-        doc.addEventListener("mouseup", this._handleMouseUp);
-        doc.addEventListener("mousemove", this._handleMouseMove);
-        doc.addEventListener("contextmenu", this._handleContextMenu);
-        doc.addEventListener("keydown", this._handleKeyEvent);
+        doc.addEventListener("mousedown", this.handleMouseDown);
+        doc.addEventListener("mouseup", this.handleMouseUp);
+        doc.addEventListener("mousemove", this.handleMouseMove);
+        doc.addEventListener("contextmenu", this.handleContextMenu);
+        doc.addEventListener("keydown", this.handleKeyEvent);
     },
     removeEvent() {
         let doc = document;
-        doc.removeEventListener("mousedown", this._handleMouseDown);
-        doc.removeEventListener("mouseup", this._handleMouseUp);
-        doc.removeEventListener("mousemove", this._handleMouseMove);
-        doc.removeEventListener("contextmenu", this._handleContextMenu);
-        doc.removeEventListener("keydown", this._handleKeyEvent);
+        doc.removeEventListener("mousedown", this.handleMouseDown);
+        doc.removeEventListener("mouseup", this.handleMouseUp);
+        doc.removeEventListener("mousemove", this.handleMouseMove);
+        doc.removeEventListener("contextmenu", this.handleContextMenu);
+        doc.removeEventListener("keydown", this.handleKeyEvent);
     },
     initSettings() {
         chrome.storage.sync.get("options", obj => {
@@ -258,15 +272,20 @@ let gesture = {
             if (!normal.disabled && normal.enableGesture) {
                 this.initEvent();
             }
-            console.log(normal)
+            this.updateProp(normal);
         });
     },
+    updateProp(props) {
+        this.minDis = props.minDis;
+        this.expire = props.expire;
+        this.expireSecond = props.expireSecond;
+    },
     init() {
-        this._handleMouseDown = this.handleMouseDown.bind(this);
-        this._handleMouseUp = this.handleMouseUp.bind(this);
-        this._handleMouseMove = this.handleMouseMove.bind(this);
-        this._handleContextMenu = this.handleContextMenu.bind(this);
-        this._handleKeyEvent = this.handleKeyEvent.bind(this);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleContextMenu = this.handleContextMenu.bind(this);
+        this.handleKeyEvent = this.handleKeyEvent.bind(this);
         chrome.storage.onChanged.addListener(this.handleStorageChange.bind(this));
         this.initSettings();
     }

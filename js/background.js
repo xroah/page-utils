@@ -105,9 +105,7 @@ function replaceNewTab(tab) {
 
 chrome.runtime.onMessage.addListener(handleMessage);
 chrome.tabs.onCreated.addListener(replaceNewTab);
-chrome.tabs.onUpdated.addListener(function (tabId, tab) {
-    replaceNewTab(tab);
-});
+chrome.tabs.onUpdated.addListener( (tabId, tab) => replaceNewTab(tab));
 
 chrome.runtime.onInstalled.addListener(detail => {
     if (detail.reason === "install") {
@@ -118,7 +116,10 @@ chrome.runtime.onInstalled.addListener(detail => {
                 showDir: true,
                 showHint: true,
                 replaceNewTab: false,
-                enableGesture: true
+                enableGesture: true,
+                expire: false, //是否超时取消
+                expireSecond: 2, //超时取消时间
+                minDis: 10, //手势生效的最小长度
             }
         };
         chrome.storage.sync.set({

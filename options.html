@@ -52,6 +52,25 @@
                     <span class="checkbox-text">开启鼠标手势</span>
                 </label>
             </div>
+            <div class="row">
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="checkbox-input" data-ref="expireSlider" id="expire">
+                        <span class="checkbox-replace"></span>
+                        <span class="checkbox-text">超过以下时间取消操作</span>
+                    </label>
+                </div>
+                <div id="expireSlider" class="transition slider-wrapper">
+                    <span>时长(s):</span>
+                    <input type="range" class="range-slider" min="1" max="5" id="expireSecond">
+                    <span class="range-value"></span>
+                </div>
+            </div>
+            <div class="row">
+                <span>手势起效的最小长度(px):</span>
+                <input type="range" class="range-slider" id="minDis" min="5" max="50">
+                <span class="range-value" id="minDisValue"></span>
+            </div>
         </div>
         <div id="gesture" class="hidden view">
             手势设置

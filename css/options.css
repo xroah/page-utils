@@ -130,6 +130,10 @@ body {
     color: #fff;
 }
 
+.slider-wrapper {
+    padding: 5px 0;
+    overflow: hidden;
+}
 
 .main-content {
     padding: 10px;

@@ -1,9 +1,9 @@
 !function () {
-    function request(url) {
+    function request(url, reponseType) {
         return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
 
-            xhr.responseType = "json";
+            xhr.responseType = reponseType || "json";
             xhr.onreadystatechange = function () {
                 if (this.readyState === 4 && this.status === 200) {
                     resolve(xhr.response);
@@ -27,12 +27,13 @@
 
     function search() {
         let input = document.getElementById("keywords");
+        let se = document.getElementById("searchEngine");
         let value = input.value;
         if (!value.trim()) {
             input.focus();
             return;
         }
-        location.assign(`https://www.baidu.com/s?wd=${input.value}`);
+        location.assign(`${se.value}${input.value}`);
     }
 
     function fetchImg() {
@@ -105,6 +106,10 @@
         });
         initEvent();
     }
+
+    request("https://www.baidu.com/home/other/data/weatherInfo?city=%E6%9D%AD%E5%B7%9E").then(res => {
+       console.log(res)
+    });
 
     init();
 
