@@ -135,6 +135,14 @@ body {
     overflow: hidden;
 }
 
+.slider-wrapper > div {
+    padding: 5px 0;
+}
+
+.color-input {
+    width: 80px;
+}
+
 .main-content {
     padding: 10px;
 }

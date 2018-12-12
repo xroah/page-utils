@@ -1,11 +1,11 @@
 function showMenu(evt) {
     let btn = evt.currentTarget;
-    let aside = document.getElementById("aside");
+    let aside = getById("aside");
     btn.classList.toggle("active");
     aside.classList.toggle("visible");
 }
 
-function handleChange(evt) {
+function handleChange(evt, type) {
     let target = evt.target;
     if (target.nodeName.toLowerCase() !== "input") return;
     if (target.type === "checkbox") {
@@ -19,19 +19,33 @@ function handleChange(evt) {
             if (target.id === "disable") {
                 opts.normal.disabled = !checked;
             } else {
-                opts.normal[target.id] = checked;
+                opts[type][target.id] = checked;
             }
             setOptions(opts);
         });
-    } else if (target.type === "range") {
+    } else {
         let valueEl = target.nextElementSibling;
         let value = target.value;
-        valueEl.innerHTML = value;
+        if (valueEl) {
+            valueEl.innerHTML = value;
+        }
         getOptions().then(opts => {
-            opts.normal[target.id] = +value;
+            if(target.type === "color") {
+                opts[type][target.id] = value;
+            } else {
+                opts[type][target.id] = +value;
+            }
             setOptions(opts);
         });
     }
+}
+
+function handleBasicChange(evt) {
+    handleChange(evt, "normal");
+}
+
+function handleGestureChange(evt) {
+    handleChange(evt, "gesture");
 }
 
 function getOptions() {
@@ -47,14 +61,17 @@ function setOptions(options) {
 }
 
 function initEvent() {
-    let showMenuBtn = document.getElementById("showMenuBtn");
+    let showMenuBtn = getById("showMenuBtn");
+    let basic = getById("basic");
+    let gesture = getById("gesture");
     showMenuBtn.addEventListener("click", showMenu);
     window.addEventListener("hashchange", handleHashChange);
-    document.body.addEventListener("change", handleChange);
+    basic.addEventListener("change", handleBasicChange);
+    gesture.addEventListener("change", handleGestureChange);
 }
 
 function handleHashChange() {
-    let btn = document.getElementById("showMenuBtn");
+    let btn = getById("showMenuBtn");
     updateView();
     //如果菜单显示则将其隐藏
     if (btn.classList.contains("active")) {
@@ -70,7 +87,7 @@ function updateView(hash = location.hash) {
         "#/gesture": "gesture",
         "#/about": "about"
     };
-    let titleEl = document.getElementById("title");
+    let titleEl = getById("title");
     let viewId;
     let links = document.querySelectorAll("#nav .router-link");
     let currentView = document.querySelector(".view:not(.hidden)");
@@ -83,7 +100,7 @@ function updateView(hash = location.hash) {
     if (currentView) {
         currentView.classList.add("hidden");
     }
-    document.getElementById(viewId).classList.remove("hidden");
+    getById(viewId).classList.remove("hidden");
     for (let link of links) {
         let parent = link.parentNode;
         if (link.hash === hash) {
@@ -101,25 +118,47 @@ function getById(id) {
 
 function initSettings() {
     chrome.storage.sync.get("options", obj => {
-        let { normal } = obj.options;
+        let { normal, gesture } = obj.options;
         let disable = getById("disable");
         let replaceNewTab = getById("replaceNewTab");
         let enableGesture = getById("enableGesture");
         let expireCheckbox = getById("expire");
-        let expireSlider = getById("expireSlider");
         let expireValue = expireSlider.querySelector(".range-value");
         let expireSecond = getById("expireSecond");
         let minDisInput = getById("minDis");
         let minDisValue = getById("minDisValue");
+        let showTrack = getById("showTrack");
+        let trackColor = getById("trackColor");
+        let trackOpacity = getById("trackOpacity");
+        let trackOpacityValue = getById("trackOpacityValue");
+        let trackWidth = getById("trackWidth");
+        let trackWidthValue = getById("trackWidthValue");
+        let showHint = getById("showHint");
+        let hintBgColor = getById("hintBgColor");
+        let hintOpacity = getById("hintOpacity");
+        let hintOpacityValue = getById("hintOpacityValue");
+        let hintTextColor = getById("hintTextColor");
         disable.checked = !normal.disabled;
         replaceNewTab.checked = normal.replaceNewTab;
         enableGesture.checked = normal.enableGesture;
-        expireCheckbox.checked = normal.expire;
         expireSecond.value = expireValue.innerHTML = normal.expireSecond;
         minDisValue.innerHTML = minDisInput.value = normal.minDis;
-        if (!normal.expire) {
-            expireSlider.classList.add("hidden");
+        if (!(expireCheckbox.checked = normal.expire)) {
+            getById("expireSlider").classList.add("hidden");
         }
+
+        if (!(showTrack.checked = gesture.showTrack)) {
+            getById("trackWrapper").classList.add("hidden");
+        }
+        trackColor.value = gesture.trackColor;
+        trackOpacity.value = trackOpacityValue.innerHTML = gesture.trackOpacity;
+        trackWidth.value = trackWidthValue.innerHTML = gesture.trackWidth;
+        if (!(showHint.checked = gesture.showHint)) {
+            getById("hintWrapper").classList.add("hidden");
+        }
+        hintBgColor.value = gesture.hintBgColor;
+        hintOpacity.value = hintOpacityValue.innerHTML = gesture.hintOpacity;
+        hintTextColor.value = gesture.hintTextColor;
     });
 }
 

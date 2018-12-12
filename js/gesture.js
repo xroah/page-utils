@@ -12,8 +12,13 @@ let gesture = {
     dirs: [],
     moveTimer: null,
     showTrack: true, //是否显示轨迹
-    showDir: true, //是否显示方向
+    trackColor: "", //轨迹颜色
+    trackWidth: 0, //轨迹宽度
+    trackOpacity: 0, //轨迹透明度
     showHint: true, //是否显示提示
+    hintOpacity: 0, //提示透明度,
+    hintBgColor: "", //提示背景色
+    hintTextColor: "", //提示文字颜色
     disabled: false, //是否禁用
     minDis: 10, //手势生效的最小长度
     expire: false, //是否超时取消
@@ -81,62 +86,60 @@ let gesture = {
             });
             this.setAttributes(polyline, {
                 "points": this.positions.join(", "),
-                "stroke": "skyblue",
-                "stroke-width": "5",
+                "stroke": this.trackColor,
+                "stroke-width": this.trackWidth,
                 "stroke-linejoin": "round",
-                "fill": "transparent"
+                "fill": "transparent",
+                "stroke-opacity": this.trackOpacity
             });
             svg.appendChild(polyline);
             div.appendChild(svg);
         }
-        if (this.showDir) {
+        if (this.showHint) {
             let imgWrapper = this.createEl("div");
+            let textWrapper = this.createEl("div");
             imgWrapper.classList.add("dir-wrapper");
             hintWrapper.appendChild(imgWrapper);
-        }
-        if (this.showHint) {
-            let textWrapper = this.createEl("div");
             textWrapper.classList.add("text-wrapper");
             hintWrapper.appendChild(textWrapper);
+            hintWrapper.style.backgroundColor = this.hintBgColor;
+            hintWrapper.style.opacity = this.hintOpacity;
+            textWrapper.style.color = this.hintTextColor;
         }
         div.appendChild(hintWrapper);
         document.body.appendChild(div);
     },
     updateDirView(dir) {
-        if (!this.showHint && !this.showDir) return;
+        if (!this.showHint) return;
         let dirWrapper = this.wrapper.querySelector(".dir-wrapper");
         let textWrapper = this.wrapper.querySelector(".text-wrapper");
-        if (dirWrapper) {
-            let dirMap = {
-                u: "images/a_up.png",
-                r: "images/a_right.png",
-                d: "images/a_down.png",
-                l: "images/a_left.png"
-            };
-            let img = new Image();
-            img.src = chrome.runtime.getURL("") + dirMap[dir];
-            dirWrapper.appendChild(img);
-        }
-        if (textWrapper) {
-            let dirTextMap = {
-                l: "后退",
-                r: "前进",
-                d: "向下滚动",
-                u: "向上滚动",
-                dr: "关闭标签",
-                dl: "新建标签",
-                lu: "重新打开",
-                rd: "到底部",
-                ru: "到顶部",
-                ul: "左侧标签",
-                ur: "右侧标签",
-                ud: "刷新",
-                udu: "强制刷新",
-                dru: "新建窗口",
-                urd: "关闭窗口"
-            };
-            textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
-        }
+        let dirMap = {
+            u: "images/a_up.png",
+            r: "images/a_right.png",
+            d: "images/a_down.png",
+            l: "images/a_left.png"
+        };
+        let dirTextMap = {
+            l: "后退",
+            r: "前进",
+            d: "向下滚动",
+            u: "向上滚动",
+            dr: "关闭标签",
+            dl: "新建标签",
+            lu: "重新打开",
+            rd: "到底部",
+            ru: "到顶部",
+            ul: "左侧标签",
+            ur: "右侧标签",
+            ud: "刷新",
+            udu: "强制刷新",
+            dru: "新建窗口",
+            urd: "关闭窗口"
+        };
+        let img = new Image();
+        img.src = chrome.runtime.getURL("") + dirMap[dir];
+        dirWrapper.appendChild(img);
+        textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
         return this;
     },
     scrollPage(dis) {
@@ -213,7 +216,7 @@ let gesture = {
         }
         if (this.expire) {
             this.clearCancelTimer();
-            this.cancelTimer = setTimeout(this.reset.bind(this), this.expireSecond * 1000)
+            this.cancelTimer = setTimeout(this.reset.bind(this), this.expireSecond * 1000);
         }
         if (dis > this.minDis) {
             if (mx > my) {
@@ -241,14 +244,13 @@ let gesture = {
         }
     },
     handleStorageChange(obj) {
-        console.log(obj)
-        let { normal } = obj.options.newValue;
+        let { normal, gesture } = obj.options.newValue;
         if (normal.disabled || !normal.enableGesture) {
             this.removeEvent()
         } else {
             this.initEvent();
         }
-        this.updateProp(normal);
+        this.updateProp(Object.assign({}, normal, gesture));
     },
     initEvent() {
         let doc = document;
@@ -268,17 +270,25 @@ let gesture = {
     },
     initSettings() {
         chrome.storage.sync.get("options", obj => {
-            let {normal} = obj.options;
+            let {normal, gesture} = obj.options;
             if (!normal.disabled && normal.enableGesture) {
                 this.initEvent();
             }
-            this.updateProp(normal);
+            this.updateProp(Object.assign({}, normal, gesture));
         });
     },
     updateProp(props) {
         this.minDis = props.minDis;
         this.expire = props.expire;
         this.expireSecond = props.expireSecond;
+        this.showTrack = props.showTrack;
+        this.trackColor = props.trackColor;
+        this.trackWidth = props.trackWidth;
+        this.trackOpacity = props.trackOpacity;
+        this.showHint = props.showHint;
+        this.hintBgColor = props.hintBgColor;
+        this.hintOpacity = props.hintOpacity;
+        this.hintTextColor = props.hintTextColor;
     },
     init() {
         this.handleMouseDown = this.handleMouseDown.bind(this);

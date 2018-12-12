@@ -73,7 +73,56 @@
             </div>
         </div>
         <div id="gesture" class="hidden view">
-            手势设置
+            <div class="row">
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="checkbox-input" data-ref="trackWrapper" id="showTrack">
+                        <span class="checkbox-replace"></span>
+                        <span class="checkbox-text">显示轨迹</span>
+                    </label>
+                </div>
+                <div id="trackWrapper" class="slider-wrapper">
+                    <div>
+                        <span>轨迹颜色:</span>
+                        <input type="color" id="trackColor" class="color-input">
+                    </div>
+                    <div>
+                        <span>不透明度:</span>
+                        <input type="range" class="range-slider" id="trackOpacity" min=".1" max="1" step=".1">
+                        <span class="range-value" id="trackOpacityValue"></span>
+                    </div>
+                    <div>
+                        <span>轨迹宽度:</span>
+                        <input type="range" class="range-slider" id="trackWidth" min="1" max="10">
+                        <span class="range-value" id="trackWidthValue"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="checkbox-input" data-ref="hintWrapper" id="showHint">
+                        <span class="checkbox-replace"></span>
+                        <span class="checkbox-text">显示提示</span>
+                    </label>
+                </div>
+                <div id="hintWrapper" class="slider-wrapper">
+                    <div>
+                        <span>背景色:</span>
+                        <input type="color" id="hintBgColor" class="color-input">
+                    </div>
+                    <div>
+                        <span>不透明度:</span>
+                        <input type="range" class="range-slider" id="hintOpacity" min=".1" max="1" step=".1">
+                        <span class="range-value" id="hintOpacityValue"></span>
+                    </div>
+                    <div>
+                        <span>文字颜色:</span>
+                        <input type="color" id="hintTextColor" class="color-input">
+                    </div>
+                </div>
+            </div>
+            <hr>
         </div>
         <div id="about" class="hidden view">
             关于
