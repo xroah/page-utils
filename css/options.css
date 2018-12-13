@@ -75,7 +75,7 @@ body {
 }
 
 .show-menu-btn.active .icon::after {
-    transform: rotate(90deg) translateX(-27%)
+    transform: rotate(90deg) translateX(-27%);
 }
 
 .show-menu-btn.active .icon {

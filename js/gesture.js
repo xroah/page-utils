@@ -19,6 +19,7 @@ let gesture = {
     hintOpacity: 0, //提示透明度,
     hintBgColor: "", //提示背景色
     hintTextColor: "", //提示文字颜色
+    hintFontSize: 20,
     disabled: false, //是否禁用
     minDis: 10, //手势生效的最小长度
     expire: false, //是否超时取消
@@ -42,6 +43,7 @@ let gesture = {
         this.preventContextMenu = false;
         if (this.wrapper) {
             document.body.removeChild(this.wrapper);
+            this.wrapper = null;
         }
         if (evt.button !== 2) return; //按下的不是鼠标右键
         let pos = this.lastPosition;
@@ -49,7 +51,6 @@ let gesture = {
         pos.y = evt.clientY;
         this.positions.push(`${pos.x} ${pos.y}`);
         this.mouseDown = true;
-        this.initView();
         if (this.moveTimer) {
             clearInterval(this.moveTimer);
             this.moveTimer = null;
@@ -105,6 +106,7 @@ let gesture = {
             hintWrapper.style.backgroundColor = this.hintBgColor;
             hintWrapper.style.opacity = this.hintOpacity;
             textWrapper.style.color = this.hintTextColor;
+            textWrapper.style.fontSize = `${this.hintFontSize}px`;
         }
         div.appendChild(hintWrapper);
         document.body.appendChild(div);
@@ -145,6 +147,11 @@ let gesture = {
     scrollPage(dis) {
         let moved = 0;
         let _dis = Math.abs(dis);
+        let sTop = document.documentElement.scrollTop;
+        if (
+            (dis < 0 && sTop === 0) ||
+            (dis > 0) && sTop === document.body.scrollHeight - window.innerHeight
+        ) return;
         this.moveTimer = setInterval(() => {
             let speed = (_dis - moved) / 5;
             moved += speed;
@@ -210,6 +217,9 @@ let gesture = {
         let my = Math.abs(y - pos.y);
         let dis = Math.sqrt(Math.pow(mx, 2) + Math.pow(my, 2));
         let dir;
+        if (!this.wrapper) {
+            this.initView();
+        }
         if (this.showTrack) {
             this.positions.push(`${x} ${y}`);
             this.polyline.setAttribute("points", this.positions.join(", "));
@@ -244,7 +254,8 @@ let gesture = {
         }
     },
     handleStorageChange(obj) {
-        let { normal, gesture } = obj.options.newValue;
+        if (!obj.options) return;
+        let {normal, gesture} = obj.options.newValue;
         if (normal.disabled || !normal.enableGesture) {
             this.removeEvent()
         } else {

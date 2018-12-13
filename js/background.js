@@ -9,6 +9,30 @@ chrome.contextMenus.create({
     }
 });
 
+const defaultOptions = {
+    normal: {
+        disabled: false,
+        showTrack: true,
+        showDir: true,
+        showHint: true,
+        replaceNewTab: false,
+        enableGesture: true,
+        expire: false, //是否超时取消
+        expireSecond: 2, //超时取消时间
+        minDis: 10, //手势生效的最小长度
+    },
+    gesture: {
+        showTrack: true,
+        trackColor: "#1998ff",
+        trackWidth: 5,
+        trackOpacity: 1,
+        showHint: true,
+        hintBgColor: "#1998ff",
+        hintTextColor: "#ffffff",
+        hintOpacity: 1
+    }
+};
+
 function switchTab(dir) {
     chrome.windows.getCurrent(window => {
         chrome.tabs.query({
@@ -108,32 +132,12 @@ chrome.tabs.onCreated.addListener(replaceNewTab);
 chrome.tabs.onUpdated.addListener( (tabId, tab) => replaceNewTab(tab));
 
 chrome.runtime.onInstalled.addListener(detail => {
+    console.log(detail)
     if (detail.reason === "install") {
-        let defaultOptions = {
-            normal: {
-                disabled: false,
-                showTrack: true,
-                showDir: true,
-                showHint: true,
-                replaceNewTab: false,
-                enableGesture: true,
-                expire: false, //是否超时取消
-                expireSecond: 2, //超时取消时间
-                minDis: 10, //手势生效的最小长度
-            },
-            gesture: {
-                showTrack: true,
-                trackColor: "#1998ff",
-                trackWidth: 5,
-                trackOpacity: 1,
-                showHint: true,
-                hintBgColor: "#1998ff",
-                hintTextColor: "#ffffff",
-                hintOpacity: 1
-            }
-        };
         chrome.storage.sync.set({
             options: defaultOptions
         });
     }
 });
+
+window.defaultOptions = defaultOptions;

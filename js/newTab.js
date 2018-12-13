@@ -39,20 +39,25 @@
     function fetchImg() {
         request("https://cn.bing.com/HPImageArchive.aspx?format=js&n=1")
             .then(res => {
-                let url = `https://cn.bing.com${res.images[0].url}`;
+                let img = res.images[0];
+                let url = `https://cn.bing.com${img.url}`;
+                let backgroundImg = {
+                    date: getToday(),
+                    url,
+                    info: img.copyright
+                };
                 chrome.storage.local.set({
-                    backgroundImg: {
-                        date: getToday(),
-                        img: url
-                    }
+                    backgroundImg
                 });
-                setBg(url);
+                setBg(backgroundImg);
             });
     }
 
-    function setBg(url) {
+    function setBg(bgImg) {
         let bgEl = document.getElementById("bg");
-        bgEl.style.backgroundImage = `url(${url})`;
+        let copyright = document.getElementById("copyright");
+        bgEl.style.backgroundImage = `url(${bgImg.url})`;
+        copyright.title = bgImg.info;
     }
 
     function fetchDailySentence() {
@@ -91,7 +96,7 @@
         chrome.storage.local.get("backgroundImg", function (item) {
             let bg = item.backgroundImg;
             if (bg && bg.date === getToday()) {
-                setBg(bg.img)
+                setBg(bg)
             } else {
                 fetchImg();
             }
@@ -107,8 +112,14 @@
         initEvent();
     }
 
-    request("https://www.baidu.com/home/other/data/weatherInfo?city=%E6%9D%AD%E5%B7%9E").then(res => {
-       console.log(res)
+    request("http://pv.sohu.com/cityjson", "text").then(res => {
+       let reg = /{.*}/;
+       let cityInfo = JSON.parse(res.match(reg)[0]);
+       return Promise.resolve(cityInfo)
+    }).then(cityInfo => {
+        return request(`https://www.tianqiapi.com/api/?version=v1&ip=${cityInfo.cip}`)
+    }).then(res => {
+        console.log(res)
     });
 
     init();
