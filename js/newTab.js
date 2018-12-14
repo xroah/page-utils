@@ -84,11 +84,17 @@
     function initEvent() {
         let searchBtn = document.getElementById("search");
         let input = document.getElementById("keywords");
+        let weather = document.getElementById("weather");
+
         searchBtn.addEventListener("click", search);
         input.addEventListener("keydown", evt => {
             if (evt.key.toLowerCase() === "enter") {
                 search();
             }
+        });
+        weather.addEventListener("click", function () {
+            let url = `http://www.weather.com.cn/weather1d/${this.getAttribute("data-cityId")}.shtml`;
+            location.assign(url);
         });
     }
 
@@ -109,18 +115,43 @@
                 fetchDailySentence();
             }
         });
+        fetchWeather();
         initEvent();
     }
 
-    request("http://pv.sohu.com/cityjson", "text").then(res => {
-       let reg = /{.*}/;
-       let cityInfo = JSON.parse(res.match(reg)[0]);
-       return Promise.resolve(cityInfo)
-    }).then(cityInfo => {
-        return request(`https://www.tianqiapi.com/api/?version=v1&ip=${cityInfo.cip}`)
-    }).then(res => {
-        console.log(res)
-    });
+    function fetchWeather() {
+        function handleRes(res) {
+            let el = document.getElementById("weather");
+            let city = el.querySelector(".city");
+            let img = el.querySelector("img");
+            let pName = el.querySelector(".pollution-name");
+            let pValue = el.querySelector(".pollution-value");
+            let temp = el.querySelector(".temperature");
+            let today = res.data[0];
+            let imgs = ["晴", "多云", "阴", "阵雨", "雷阵雨", "雷阵雨伴有冰雹", "雨夹雪", "小雨", "中雨", "大雨", "暴雨", "大暴雨", "特大暴雨", "阵雪", "小雪", "中雪", "大雪", "暴雪", "雾", "冻雨", "沙尘暴", "小雨转中雨", "中雨转大雨", "大雨转暴雨", "暴雨转大暴雨", "小雪转中雪", "中雪转大雪", "大雪转暴雪", "浮尘", "扬沙", "强沙尘暴", "霾"];
+            city.innerHTML = res.city;
+            for (let i of imgs) {
+                if (new RegExp(`^${i}`).test(today.wea)) {
+                    img.src = `${chrome.runtime.getURL("")}images/weather/${i}.png`;
+                    break;
+                }
+            }
+            el.setAttribute("data-cityId", res.cityid);
+            img.title = today.wea;
+            pName.innerHTML = today.air_level;
+            pName.title = today.air_tips;
+            pValue.innerHTML = today.air;
+            temp.innerHTML = `${today.tem1}-${today.tem2}`;
+            console.log(res)
+        }
+        request("http://pv.sohu.com/cityjson", "text").then(res => {
+            let reg = /{.*}/;
+            let cityInfo = JSON.parse(res.match(reg)[0]);
+            return Promise.resolve(cityInfo)
+        }).then(cityInfo => {
+            return request(`https://www.tianqiapi.com/api/?version=v1&ip=${cityInfo.cip}`)
+        }).then(handleRes);
+    }
 
     init();
 
