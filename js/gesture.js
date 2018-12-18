@@ -4,6 +4,7 @@ let gesture = {
         x: 0,
         y: 0
     },
+    linuxInterval: 0, //Linux下会先触发contextmenu事件
     svgTag: null,
     polyline: null,
     wrapper: null,
@@ -40,12 +41,21 @@ let gesture = {
         return ns ? doc.createElementNS(ns, str) : doc.createElement(str);
     },
     handleMouseDown(evt) {
+        let ua = navigator.userAgent.toLowerCase();
         this.preventContextMenu = false;
+        if (evt.button !== 2) return; //按下的不是鼠标右键
+        if (ua.includes("linux")) {
+            let time = Date.now();
+            if (time - this.linuxInterval < 500) {//双击小于500毫秒才触发contextmenu
+                return;
+            }
+            this.preventContextMenu = true;
+            this.linuxInterval = time;
+        }
         if (this.wrapper) {
             document.body.removeChild(this.wrapper);
             this.wrapper = null;
         }
-        if (evt.button !== 2) return; //按下的不是鼠标右键
         let pos = this.lastPosition;
         pos.x = evt.clientX;
         pos.y = evt.clientY;
