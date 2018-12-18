@@ -79,6 +79,7 @@
         let sEl = document.getElementById("sentence");
         sEl.innerHTML = sentence.english;
         sEl.title = sentence.chinese;
+        sEl.classList.remove("scale-invisible");
     }
 
     function initEvent() {
@@ -142,7 +143,7 @@
             pName.title = today.air_tips;
             pValue.innerHTML = today.air;
             temp.innerHTML = `${today.tem1}-${today.tem2}`;
-            console.log(res)
+            el.classList.remove("scale-invisible");
         }
         request("http://pv.sohu.com/cityjson", "text").then(res => {
             let reg = /{.*}/;

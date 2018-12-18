@@ -19,6 +19,11 @@
     color: #fff;
     background-color: rgba(0, 0, 0, .3);
     cursor: pointer;
+    transition: all .3s;
+}
+
+.scale-invisible {
+    transform: scale(0);
 }
 
 .weather .pollution-name {
@@ -46,6 +51,7 @@
     text-shadow: 0 0 5px rgba(24, 144, 255, .5);
     color: #333;
     background-color: rgba(255, 255, 255, .3);
+    transition: all .3s;
 }
 
 .search-wrapper {
