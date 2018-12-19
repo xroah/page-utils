@@ -7,6 +7,13 @@ function showMenu(evt) {
 
 function handleChange(evt, type) {
     let target = evt.target;
+    if (target.id === "mouseBtnSel") {
+        getOptions().then(opts => {
+            opts.gesture.button = +target.value;
+            setOptions(opts);
+        });
+        return;
+    }
     if (target.nodeName.toLowerCase() !== "input") return;
     if (target.type === "checkbox") {
         let checked = target.checked;
@@ -60,6 +67,24 @@ function setOptions(options) {
     });
 }
 
+function handleClick(evt) {
+    let tgt = evt.target;
+    if (tgt.classList.contains("reset")) {
+        chrome.runtime.sendMessage({
+            type: "reset",
+            message: tgt.dataset.type
+        });
+    }
+}
+
+function handleMessage(evt, sender, sendResponse) {
+    switch (evt.type) {
+        case "resetSuccess":
+            initSettings();
+            break;
+    }
+}
+
 function initEvent() {
     let showMenuBtn = getById("showMenuBtn");
     let basic = getById("basic");
@@ -68,6 +93,8 @@ function initEvent() {
     window.addEventListener("hashchange", handleHashChange);
     basic.addEventListener("change", handleBasicChange);
     gesture.addEventListener("change", handleGestureChange);
+    document.addEventListener("click", handleClick);
+    chrome.runtime.onMessage.addListener(handleMessage);
 }
 
 function handleHashChange() {
@@ -138,6 +165,7 @@ function initSettings() {
         let hintOpacity = getById("hintOpacity");
         let hintOpacityValue = getById("hintOpacityValue");
         let hintTextColor = getById("hintTextColor");
+        let mouseSel = getById("mouseBtnSel");
         disable.checked = !normal.disabled;
         replaceNewTab.checked = normal.replaceNewTab;
         enableGesture.checked = normal.enableGesture;
@@ -159,6 +187,7 @@ function initSettings() {
         hintBgColor.value = gesture.hintBgColor;
         hintOpacity.value = hintOpacityValue.innerHTML = gesture.hintOpacity;
         hintTextColor.value = gesture.hintTextColor;
+        mouseSel.value = gesture.button;
     });
 }
 

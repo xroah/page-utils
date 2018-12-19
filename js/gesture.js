@@ -26,7 +26,8 @@ let gesture = {
     expire: false, //是否超时取消
     expireSecond: 2,//超时取消时间
     cancelTimer: null,
-    setAttributes(el, attributes) {
+    button: 2, //触发手势鼠标按键
+    setAttrs(el, attributes) {
         for (let key in attributes) {
             el.setAttribute(key, attributes[key]);
         }
@@ -42,15 +43,20 @@ let gesture = {
     },
     handleMouseDown(evt) {
         let ua = navigator.userAgent.toLowerCase();
+        if (evt.button !== this.button) return;
         this.preventContextMenu = false;
-        if (evt.button !== 2) return; //按下的不是鼠标右键
-        if (ua.includes("linux")) {
-            let time = Date.now();
-            if (time - this.linuxInterval < 500) {//双击小于500毫秒才触发contextmenu
-                return;
+        if (this.button === 1) {
+            //按下的是鼠标中键,阻止默认行为否则页面会滚动
+            evt.preventDefault();
+        } else if (this.button === 2) {
+            if (ua.includes("linux")) {//linux系统中
+                let time = Date.now();
+                if (time - this.linuxInterval < 500) {//双击小于500毫秒才触发contextmenu
+                    return;
+                }
+                this.preventContextMenu = true;
+                this.linuxInterval = time;
             }
-            this.preventContextMenu = true;
-            this.linuxInterval = time;
         }
         if (this.wrapper) {
             document.body.removeChild(this.wrapper);
@@ -70,6 +76,9 @@ let gesture = {
         if (this.wrapper) {
             document.body.removeChild(this.wrapper);
         }
+        if (this.dirs.length) {
+            this.preventContextMenu = true;
+        }
         this.mouseDown = false;
         this.wrapper = null;
         this.svgTag = null;
@@ -79,7 +88,7 @@ let gesture = {
         return this;
     },
     handleMouseUp(evt) {
-        if (evt.button !== 2 || !this.mouseDown) return;
+        if (evt.button !== this.button || !this.mouseDown) return;
         this.execute().reset().clearCancelTimer();
     },
     initView() {
@@ -91,11 +100,11 @@ let gesture = {
             let svgNS = "http://www.w3.org/2000/svg";
             let polyline = this.polyline = this.createEl("polyline", svgNS);
             let svg = this.svgTag = this.createEl("svg", svgNS);
-            this.setAttributes(svg, {
+            this.setAttrs(svg, {
                 width: window.innerWidth,
                 height: window.innerHeight
             });
-            this.setAttributes(polyline, {
+            this.setAttrs(polyline, {
                 "points": this.positions.join(", "),
                 "stroke": this.trackColor,
                 "stroke-width": this.trackWidth,
@@ -180,7 +189,6 @@ let gesture = {
     execute() {
         let dirs = this.dirs.join("");
         if (!dirs) return this;
-        this.preventContextMenu = true;
         switch (dirs) {
             case "l": //后退
                 history.back();
@@ -310,6 +318,7 @@ let gesture = {
         this.hintBgColor = props.hintBgColor;
         this.hintOpacity = props.hintOpacity;
         this.hintTextColor = props.hintTextColor;
+        this.button = props.button;
     },
     init() {
         this.handleMouseDown = this.handleMouseDown.bind(this);

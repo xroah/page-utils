@@ -71,6 +71,12 @@
                 <input type="range" class="range-slider" id="minDis" min="5" max="50">
                 <span class="range-value" id="minDisValue"></span>
             </div>
+            <div class="row">
+                <hr>
+            </div>
+            <div class="row">
+                <button class="btn btn-primary reset" data-type="normal">恢复默认</button>
+            </div>
         </div>
         <div id="gesture" class="hidden view">
             <div class="row">
@@ -122,7 +128,19 @@
                     </div>
                 </div>
             </div>
-            <hr>
+            <div class="row">
+                <span>触发手势按键:</span>
+                <select id="mouseBtnSel">
+                    <option value="2">鼠标右键</option>
+                    <option value="1">鼠标中键</option>
+                </select>
+            </div>
+            <div class="row">
+                <hr>
+            </div>
+            <div class="row">
+                <button class="btn btn-primary reset" data-type="gesture">恢复默认</button>
+            </div>
         </div>
         <div id="about" class="hidden view">
             关于

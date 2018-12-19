@@ -29,7 +29,8 @@ const defaultOptions = {
         showHint: true,
         hintBgColor: "#1998ff",
         hintTextColor: "#ffffff",
-        hintOpacity: 1
+        hintOpacity: 1,
+        button: 2
     }
 };
 
@@ -73,7 +74,22 @@ function handleMessage(evt, sender, sendResponse) {
         case "executeGesture":
             executeGesture(evt.message);
             break;
+        case "reset":
+            handleReset(evt.message);
+            break;
     }
+}
+
+function handleReset(type) {
+    console.log(type)
+    chrome.storage.sync.get("options", obj => {
+        let options = obj.options;
+        options[type] = defaultOptions[type];
+        chrome.storage.sync.set({
+            options
+        });
+        chrome.runtime.sendMessage({type: "resetSuccess"});
+    })
 }
 
 function executeGesture(message) {
@@ -139,5 +155,3 @@ chrome.runtime.onInstalled.addListener(detail => {
         });
     }
 });
-
-window.defaultOptions = defaultOptions;
