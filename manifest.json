@@ -27,9 +27,9 @@
   "permissions": [
     "tabs",
     "storage",
-    "webRequest",
     "contextMenus",
-    "sessions"
+    "sessions",
+    "downloads"
   ],
   "content_scripts": [
     {

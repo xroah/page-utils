@@ -1,10 +1,9 @@
 chrome.contextMenus.create({
-    title: "查看图片",
+    title: "下载",
     contexts: ["image"],
     onclick(img) {
-        chrome.tabs.create({
-            url: img.srcUrl,
-            active: true
+        chrome.downloads.download({
+            url: img.srcUrl
         });
     }
 });

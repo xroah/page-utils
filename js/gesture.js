@@ -1,3 +1,26 @@
+const DIR_MAP = {
+    u: "images/a_up.png",
+    r: "images/a_right.png",
+    d: "images/a_down.png",
+    l: "images/a_left.png"
+};
+const DIR_TEXT_MAP = {
+    l: "后退",
+    r: "前进",
+    d: "向下滚动",
+    u: "向上滚动",
+    dr: "关闭标签",
+    dl: "新建标签",
+    lu: "重新打开",
+    rd: "到底部",
+    ru: "到顶部",
+    ul: "左侧标签",
+    ur: "右侧标签",
+    ud: "刷新",
+    udu: "强制刷新",
+    dru: "新建窗口",
+    urd: "关闭窗口"
+};
 let gesture = {
     mouseDown: false,
     lastPosition: {
@@ -134,33 +157,10 @@ let gesture = {
         if (!this.showHint) return;
         let dirWrapper = this.wrapper.querySelector(".dir-wrapper");
         let textWrapper = this.wrapper.querySelector(".text-wrapper");
-        let dirMap = {
-            u: "images/a_up.png",
-            r: "images/a_right.png",
-            d: "images/a_down.png",
-            l: "images/a_left.png"
-        };
-        let dirTextMap = {
-            l: "后退",
-            r: "前进",
-            d: "向下滚动",
-            u: "向上滚动",
-            dr: "关闭标签",
-            dl: "新建标签",
-            lu: "重新打开",
-            rd: "到底部",
-            ru: "到顶部",
-            ul: "左侧标签",
-            ur: "右侧标签",
-            ud: "刷新",
-            udu: "强制刷新",
-            dru: "新建窗口",
-            urd: "关闭窗口"
-        };
         let img = new Image();
-        img.src = chrome.runtime.getURL("") + dirMap[dir];
+        img.src = chrome.runtime.getURL("") + DIR_MAP[dir];
         dirWrapper.appendChild(img);
-        textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
+        textWrapper.innerHTML = DIR_TEXT_MAP[this.dirs.join("")] || "";
         return this;
     },
     scrollPage(dis) {
@@ -283,17 +283,17 @@ let gesture = {
     },
     initEvent() {
         let doc = document;
-        doc.addEventListener("mousedown", this.handleMouseDown);
-        doc.addEventListener("mouseup", this.handleMouseUp);
-        doc.addEventListener("mousemove", this.handleMouseMove);
+        doc.addEventListener("mousedown", this.handleMouseDown, true);
+        doc.addEventListener("mouseup", this.handleMouseUp, true);
+        doc.addEventListener("mousemove", this.handleMouseMove, true);
         doc.addEventListener("contextmenu", this.handleContextMenu);
         doc.addEventListener("keydown", this.handleKeyEvent);
     },
     removeEvent() {
         let doc = document;
-        doc.removeEventListener("mousedown", this.handleMouseDown);
-        doc.removeEventListener("mouseup", this.handleMouseUp);
-        doc.removeEventListener("mousemove", this.handleMouseMove);
+        doc.removeEventListener("mousedown", this.handleMouseDown, true);
+        doc.removeEventListener("mouseup", this.handleMouseUp, true);
+        doc.removeEventListener("mousemove", this.handleMouseMove, true);
         doc.removeEventListener("contextmenu", this.handleContextMenu);
         doc.removeEventListener("keydown", this.handleKeyEvent);
     },

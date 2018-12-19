@@ -191,8 +191,34 @@ function initSettings() {
     });
 }
 
+function initGestureView() {
+    let keys = Object.keys(DIR_TEXT_MAP);
+    let urlPrefix = chrome.runtime.getURL("");
+    let frag = document.createDocumentFragment();
+    let con = document.getElementById("gestureList");
+    for (let k of keys) {
+        let div = document.createElement("div");
+        let dl = document.createElement("dl");
+        let dt = document.createElement("dt");
+        let dd = document.createElement("dd");
+        let dirs = k.split("");
+        for (let d of dirs) {
+            let img = new Image();
+            img.src = `${urlPrefix}${DIR_MAP[d]}`;
+            dt.appendChild(img);
+        }
+        dd.innerHTML = DIR_TEXT_MAP[k];
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+        div.appendChild(dl);
+        frag.appendChild(div);
+    }
+    con.appendChild(frag);
+}
+
 function init() {
     initSettings();
+    initGestureView();
     initEvent();
     updateView();
 }

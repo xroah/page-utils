@@ -45,12 +45,11 @@
 
 .daily-sentence {
     margin-top: 50px;
-    width: 460px;
+    width: 538px;
     padding: 5px;
     font-size: 20px;
     text-shadow: 0 0 5px rgba(24, 144, 255, .5);
     color: #333;
-    background-color: rgba(255, 255, 255, .3);
     transition: all .3s;
 }
 
@@ -106,4 +105,37 @@
     width: 50px;
     height: 50px;
     background: url("../images/info.png") no-repeat center center/100% 100%;
+}
+
+.article-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 538px;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, .6);
+}
+
+.article-list a {
+    display: inline-block;
+    width: 100%;
+    margin: 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #333;
+    transition: all .3s;
+    transform-origin: left center;
+}
+
+.article-list a:hover {
+    transform: scale(1.2);
+    color: #1890ff;
+}
+
+@media screen and (max-width: 500px) {
+    .article-list {
+        width: 100%;
+    }
 }

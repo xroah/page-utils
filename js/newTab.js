@@ -1,17 +1,19 @@
 !function () {
-    function request(url, reponseType) {
+    function request(url, responseType = "json") {
         return new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
 
-            xhr.responseType = reponseType || "json";
+            xhr.responseType = responseType;
+
             xhr.onreadystatechange = function () {
                 if (this.readyState === 4 && this.status === 200) {
                     resolve(xhr.response);
                 }
-            };
 
+            };
             xhr.onerror = function () {
                 console.log("出错了");
+
             };
 
             xhr.open("GET", url, true);
@@ -99,25 +101,20 @@
         });
     }
 
-    function init() {
-        chrome.storage.local.get("backgroundImg", function (item) {
-            let bg = item.backgroundImg;
-            if (bg && bg.date === getToday()) {
-                setBg(bg)
-            } else {
-                fetchImg();
+    function fetchArticles() {//获取掘金前端热门文章
+        let url = "https://timeline-merger-ms.juejin.im/v1/get_entry_by_rank?src=web&category=5562b415e4b00c57d9b94ac8";
+        request(url).then(res => {
+            let list = res.d.entrylist;
+            let el = document.getElementById("articles");
+            let frag = document.createDocumentFragment();
+            for (let item of list) {
+                let a = document.createElement("a");
+                a.href = item.originalUrl;
+                a.innerHTML = item.title;
+                frag.appendChild(a);
             }
+            el.appendChild(frag);
         });
-        chrome.storage.local.get("sentence", function (item) {
-            let sentence = item.sentence;
-            if (sentence && sentence.date === getToday()) {
-                updateSentence(sentence);
-            } else {
-                fetchDailySentence();
-            }
-        });
-        fetchWeather();
-        initEvent();
     }
 
     function fetchWeather() {
@@ -152,6 +149,28 @@
         }).then(cityInfo => {
             return request(`https://www.tianqiapi.com/api/?version=v1&ip=${cityInfo.cip}`)
         }).then(handleRes);
+    }
+
+    function init() {
+        chrome.storage.local.get("backgroundImg", function (item) {
+            let bg = item.backgroundImg;
+            if (bg && bg.date === getToday()) {
+                setBg(bg)
+            } else {
+                fetchImg();
+            }
+        });
+        chrome.storage.local.get("sentence", function (item) {
+            let sentence = item.sentence;
+            if (sentence && sentence.date === getToday()) {
+                updateSentence(sentence);
+            } else {
+                fetchDailySentence();
+            }
+        });
+        fetchWeather();
+        fetchArticles();
+        initEvent();
     }
 
     init();

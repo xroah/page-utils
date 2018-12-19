@@ -9,6 +9,10 @@ body {
     font-size: 14px;
 }
 
+dl, dd {
+    margin: 0;
+}
+
 p {
     margin: 0;
 }
@@ -99,7 +103,7 @@ select {
     cursor: not-allowed;
 }
 
-.checkbox-input:disabled:checked  + .checkbox-replace{
+.checkbox-input:disabled:checked + .checkbox-replace {
     background-color: #aaa;
     border-color: #aaa;
 }
@@ -196,8 +200,6 @@ select {
 .btn-primary:active {
     background-color: #096dd9;
 }
-
-
 
 .transition {
     transition: all .3s;
