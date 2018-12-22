@@ -39,7 +39,10 @@
     }
 
     function fetchImg() {
-        request("https://cn.bing.com/HPImageArchive.aspx?format=js&n=1")
+        let time = Date.now();
+        //防止缓存
+        let url = `https://cn.bing.com/HPImageArchive.aspx?format=js&n=1&__time=${time}`;
+        request(url)
             .then(res => {
                 let img = res.images[0];
                 let url = `https://cn.bing.com${img.url}`;
