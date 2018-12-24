@@ -119,24 +119,16 @@
 }
 
 .article-list a {
-    display: inline-block;
-    width: 100%;
     margin: 5px 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #333;
     transition: all .3s;
-    transform-origin: left center;
+    transform-origin: left;
 }
 
 .article-list a:hover {
-    transform: scale(1.2);
     color: #1890ff;
-}
-
-@media screen and (max-width: 500px) {
-    .article-list {
-        width: 100%;
-    }
+    transform: scale(1.05);
 }
