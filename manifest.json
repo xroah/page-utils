@@ -29,7 +29,11 @@
     "storage",
     "contextMenus",
     "sessions",
-    "downloads"
+    "downloads",
+    "webRequest",
+    "webRequestBlocking",
+    "http://*/*",
+    "https://*/*"
   ],
   "content_scripts": [
     {

@@ -80,14 +80,15 @@ function handleMessage(evt, sender, sendResponse) {
 }
 
 function handleReset(type) {
-    console.log(type)
     chrome.storage.sync.get("options", obj => {
         let options = obj.options;
         options[type] = defaultOptions[type];
         chrome.storage.sync.set({
             options
         });
-        chrome.runtime.sendMessage({type: "resetSuccess"});
+        chrome.runtime.sendMessage({
+            type: "resetSuccess"
+        });
     })
 }
 
@@ -106,7 +107,7 @@ function executeGesture(message) {
                 active: true
             });
             break;
-        case "lu"://重新打开关闭的标签或者窗口
+        case "lu": //重新打开关闭的标签或者窗口
             chrome.sessions.restore();
             break;
         case "ul": //左侧标签
@@ -129,11 +130,12 @@ function executeGesture(message) {
 function replaceNewTab(tab) {
     if (tab.url === "chrome://newtab/") {
         chrome.storage.sync.get("options", obj => {
-            let {normal} = obj.options;
+            let {
+                normal
+            } = obj.options;
             if (!normal.disabled && normal.replaceNewTab) {
                 chrome.tabs.update(
-                    tab.id,
-                    {
+                    tab.id, {
                         url: chrome.runtime.getURL("") + "newTab.html"
                     }
                 );
@@ -144,7 +146,7 @@ function replaceNewTab(tab) {
 
 chrome.runtime.onMessage.addListener(handleMessage);
 chrome.tabs.onCreated.addListener(replaceNewTab);
-chrome.tabs.onUpdated.addListener( (tabId, tab) => replaceNewTab(tab));
+chrome.tabs.onUpdated.addListener((tabId, tab) => replaceNewTab(tab));
 
 chrome.runtime.onInstalled.addListener(detail => {
     console.log(detail)
@@ -154,3 +156,10 @@ chrome.runtime.onInstalled.addListener(detail => {
         });
     }
 });
+
+
+chrome.webRequest.onBeforeRequest.addListener(details => {
+    console.log("request===>", details)
+}, {
+    urls: ["<all_urls>"]
+}, ["blocking"]);
