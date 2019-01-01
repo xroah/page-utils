@@ -1,0 +1,45 @@
+include ../../mixins/checkbox
+#gesture.hidden.view
+    .row
+        div
+            +checkbox("showTrack", "显示轨迹", {"data-ref": "trackWrapper"})
+        #trackWrapper
+            div
+                span 轨迹颜色:
+                input#trackColor.color-input(type="color")
+            div
+                span 不透明度:
+                input#trackOpacity.range-slider(type="range" min=".1" max="1" step=".1")
+                span#trackOpacityValue.range-value
+            div
+                span 轨迹宽度:
+                input#trackWidth.range-slider(type="range" min="1" max="10")
+                span.range-value#trackWidthValue
+    .row
+        div
+            +checkbox("showHint", "显示提示", {"data-ref": "hintWrapper"})
+        div#hintWrapper.slider-wrapper
+            div
+                span 背景色:
+                input#hintBgColor.color-input(type="color")
+            div
+                span 不透明度:
+                input#hintOpacity.range-slider(type="range" min=".1" max="1" step=".1")
+                span#hintOpacityValue.range-value
+            div
+                span 文字颜色
+                input#hintTextColor.color-input(type="color")
+    .row
+        span 触发手势按键:
+        select#mouseBtnSel
+            option(value="2") 鼠标右键
+            option(value="1") 鼠标中键
+    .row
+        hr
+    .row.gesture-list-wrapper
+        div 手势:
+        #gestureList.gesture-list
+    .row
+        hr
+    .row
+        button.btn.btn-primary.reset(type="button" data-type="gesture") 恢复默认

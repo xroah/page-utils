@@ -1,0 +1,5 @@
+mixin checkbox(id, text, attrs={})
+    label.checkbox-label
+        input.checkbox-input(type="checkbox" id=id)&attributes(attrs)
+        span.checkbox-replace
+        span.checkbox-text #{text}

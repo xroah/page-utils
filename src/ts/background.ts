@@ -1,46 +1,24 @@
+import defaultOptions from "./variables/defaultOptions";
+import { EventProps } from "./interface/index";
+
 chrome.contextMenus.create({
     title: "下载",
     contexts: ["image"],
-    onclick(img) {
+    onclick(img: chrome.contextMenus.OnClickData) {
         chrome.downloads.download({
             url: img.srcUrl
         });
     }
 });
 
-const defaultOptions = {
-    normal: {
-        disabled: false,
-        showTrack: true,
-        showDir: true,
-        showHint: true,
-        replaceNewTab: false,
-        enableGesture: true,
-        expire: false, //是否超时取消
-        expireSecond: 2, //超时取消时间
-        minDis: 10, //手势生效的最小长度
-    },
-    gesture: {
-        showTrack: true,
-        trackColor: "#1998ff",
-        trackWidth: 5,
-        trackOpacity: 1,
-        showHint: true,
-        hintBgColor: "#1998ff",
-        hintTextColor: "#ffffff",
-        hintOpacity: 1,
-        button: 2
-    }
-};
-
-function switchTab(dir) {
-    chrome.windows.getCurrent(window => {
+function switchTab(dir: string) {
+    chrome.windows.getCurrent((window: chrome.windows.Window) => {
         chrome.tabs.query({
             windowId: window.id
-        }, tabs => {
-            let len = tabs.length;
-            let index = 0;
-            let tab;
+        }, (tabs: Array<chrome.tabs.Tab>) => {
+            let len: number = tabs.length;
+            let index:number = 0;
+            let tab: chrome.tabs.Tab;
             for (let i = 0; i < len; i++) {
                 if (tabs[i].active) {
                     index = i;
@@ -65,40 +43,28 @@ function switchTab(dir) {
                 active: true
             });
         });
-    });
+    })
 }
 
-function handleMessage(evt, sender, sendResponse) {
-    switch (evt.type) {
-        case "executeGesture":
-            executeGesture(evt.message);
-            break;
-        case "reset":
-            handleReset(evt.message);
-            break;
-    }
-}
-
-function handleReset(type) {
-    chrome.storage.sync.get("options", obj => {
+function handleReset(type: "normal" | "gesture") {
+    console.log(type)
+    chrome.storage.sync.get("options", (obj: any) => {
         let options = obj.options;
         options[type] = defaultOptions[type];
         chrome.storage.sync.set({
             options
         });
-        chrome.runtime.sendMessage({
-            type: "resetSuccess"
-        });
+        chrome.runtime.sendMessage({type: "resetSuccess"});
     })
 }
 
-function executeGesture(message) {
+function executeGesture(message: string) {
     switch (message) {
         case "dr": //关闭标签
             chrome.tabs.query({
                 active: true,
                 currentWindow: true
-            }, tabs => {
+            }, (tabs: Array<chrome.tabs.Tab>) => {
                 chrome.tabs.remove(tabs[0].id);
             });
             break;
@@ -107,7 +73,7 @@ function executeGesture(message) {
                 active: true
             });
             break;
-        case "lu": //重新打开关闭的标签或者窗口
+        case "lu"://重新打开关闭的标签或者窗口
             chrome.sessions.restore();
             break;
         case "ul": //左侧标签
@@ -120,22 +86,21 @@ function executeGesture(message) {
             chrome.windows.create();
             break;
         case "urd": //关闭窗口
-            chrome.windows.getCurrent(window => {
-                chrome.windows.remove(window.id);
+            chrome.windows.getCurrent((win: chrome.windows.Window) => {
+                chrome.windows.remove(win.id);
             });
             break;
     }
 }
 
-function replaceNewTab(tab) {
+function replaceNewTab(tab: chrome.tabs.Tab) {
     if (tab.url === "chrome://newtab/") {
-        chrome.storage.sync.get("options", obj => {
-            let {
-                normal
-            } = obj.options;
+        chrome.storage.sync.get("options", (obj: any) => {
+            let {normal} = obj.options;
             if (!normal.disabled && normal.replaceNewTab) {
                 chrome.tabs.update(
-                    tab.id, {
+                    tab.id,
+                    {
                         url: chrome.runtime.getURL("") + "newTab.html"
                     }
                 );
@@ -144,22 +109,25 @@ function replaceNewTab(tab) {
     }
 }
 
+function handleMessage(evt: EventProps) {
+    switch (evt.type) {
+        case "executeGesture":
+            executeGesture(evt.message);
+            break;
+        case "reset":
+            handleReset(evt.message as ("normal" | "gesture"));
+            break;
+    }
+}
+
 chrome.runtime.onMessage.addListener(handleMessage);
 chrome.tabs.onCreated.addListener(replaceNewTab);
-chrome.tabs.onUpdated.addListener((tabId, tab) => replaceNewTab(tab));
+chrome.tabs.onUpdated.addListener( (tabId: number, tab: chrome.tabs.Tab) => replaceNewTab(tab));
 
-chrome.runtime.onInstalled.addListener(detail => {
-    console.log(detail)
+chrome.runtime.onInstalled.addListener((detail: chrome.runtime.InstalledDetails) => {
     if (detail.reason === "install") {
         chrome.storage.sync.set({
             options: defaultOptions
         });
     }
 });
-
-
-chrome.webRequest.onBeforeRequest.addListener(details => {
-    console.log("request===>", details)
-}, {
-    urls: ["<all_urls>"]
-}, ["blocking"]);

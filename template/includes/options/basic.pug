@@ -1,0 +1,25 @@
+include ../../mixins/checkbox
+include  ../../mixins/switch
+#basic.hidden.view
+    .row
+        span.font-bold 功能开启:
+        +switch("disable")
+    .row
+        +checkbox("replaceNewTab", "替换新标签页")
+    .row
+        +checkbox("enableGesture", "开启鼠标手势")
+    .row
+        div
+            +checkbox("expire", "超过以下时间取消操作", {"data-ref": "expireSlider"})
+        #expireSlider.transition.slider-wrapper
+            span 时长(s):
+            input#expireSecond.range-slider(type=range min="1", max="5")
+            span.range-value
+    .row
+        span 手势起效的最小长度(px):
+        input#minDis.range-slider(type="range" min="5" max="50")
+        span.range-value#minDisValue
+    .row
+        hr
+    .row
+        button.btn.btn-primary.reset(data-type="normal") 恢复默认

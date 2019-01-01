@@ -1,27 +1,7 @@
-const DIR_MAP = {
-    u: "images/a_up.png",
-    r: "images/a_right.png",
-    d: "images/a_down.png",
-    l: "images/a_left.png"
-};
-const DIR_TEXT_MAP = {
-    l: "后退",
-    r: "前进",
-    d: "向下滚动",
-    u: "向上滚动",
-    dr: "关闭标签",
-    dl: "新建标签",
-    lu: "重新打开",
-    rd: "到底部",
-    ru: "到顶部",
-    ul: "左侧标签",
-    ur: "右侧标签",
-    ud: "刷新",
-    udu: "强制刷新",
-    dru: "新建窗口",
-    urd: "关闭窗口"
-};
-let gesture = {
+import {DIR_MAP, DIR_TEXT_MAP} from "./variables/constants";
+import "../sass/gesture.scss";
+
+let gesture: any = {
     mouseDown: false,
     lastPosition: {
         x: 0,
@@ -50,7 +30,7 @@ let gesture = {
     expireSecond: 2,//超时取消时间
     cancelTimer: null,
     button: 2, //触发手势鼠标按键
-    setAttrs(el, attributes) {
+    setAttrs(el: HTMLElement, attributes: any) {
         for (let key in attributes) {
             el.setAttribute(key, attributes[key]);
         }
@@ -60,19 +40,19 @@ let gesture = {
         let dirs = this.dirs;
         return dirs[dirs.length - 1];
     },
-    createEl(str, ns) {
+    createEl(str: string, ns: string) {
         let doc = document;
         return ns ? doc.createElementNS(ns, str) : doc.createElement(str);
     },
-    handleMouseDown(evt) {
-        let ua = navigator.userAgent.toLowerCase();
+    handleMouseDown(evt: MouseEvent) {
+        let ua: string = navigator.userAgent.toLowerCase();
         if (evt.button !== this.button) return;
         this.preventContextMenu = false;
         if (this.button === 1) {
             //按下的是鼠标中键,阻止默认行为否则页面会滚动
             evt.preventDefault();
         } else if (this.button === 2) {
-            if (ua.includes("linux")) {//linux系统中
+            if (ua.indexOf("linux") > -1) {//linux系统中
                 let time = Date.now();
                 if (time - this.linuxInterval < 500) {//双击小于500毫秒才触发contextmenu
                     return;
@@ -85,7 +65,7 @@ let gesture = {
             document.body.removeChild(this.wrapper);
             this.wrapper = null;
         }
-        let pos = this.lastPosition;
+        let pos: any = this.lastPosition;
         pos.x = evt.clientX;
         pos.y = evt.clientY;
         this.positions.push(`${pos.x} ${pos.y}`);
@@ -110,7 +90,7 @@ let gesture = {
         this.dirs = [];
         return this;
     },
-    handleMouseUp(evt) {
+    handleMouseUp(evt: MouseEvent) {
         if (evt.button !== this.button || !this.mouseDown) return;
         this.execute().reset().clearCancelTimer();
     },
@@ -153,17 +133,19 @@ let gesture = {
         div.appendChild(hintWrapper);
         document.body.appendChild(div);
     },
-    updateDirView(dir) {
+    updateDirView(dir: any) {
         if (!this.showHint) return;
         let dirWrapper = this.wrapper.querySelector(".dir-wrapper");
         let textWrapper = this.wrapper.querySelector(".text-wrapper");
+        let dirMap = DIR_MAP as any;
+        let dirTextMap = DIR_TEXT_MAP as any;
         let img = new Image();
-        img.src = chrome.runtime.getURL("") + DIR_MAP[dir];
+        img.src = chrome.runtime.getURL("") + dirMap[dir];
         dirWrapper.appendChild(img);
-        textWrapper.innerHTML = DIR_TEXT_MAP[this.dirs.join("")] || "";
+        textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
         return this;
     },
-    scrollPage(dis) {
+    scrollPage(dis: number) {
         let moved = 0;
         let _dis = Math.abs(dis);
         let sTop = document.documentElement.scrollTop;
@@ -226,7 +208,7 @@ let gesture = {
         }
         return this;
     },
-    handleMouseMove(evt) {
+    handleMouseMove(evt: MouseEvent) {
         if (!this.mouseDown) return;
         let pos = this.lastPosition;
         let x = evt.clientX;
@@ -260,18 +242,18 @@ let gesture = {
             pos.y = y;
         }
     },
-    handleContextMenu(evt) {
+    handleContextMenu(evt: Event) {
         if (this.preventContextMenu) {
             evt.preventDefault();
         }
     },
-    handleKeyEvent(evt) {
+    handleKeyEvent(evt: KeyboardEvent) {
         let key = (evt.key || "").toLowerCase(); //sometimes the evt.key is undefined
         if (key === "escape") {
             this.reset();
         }
     },
-    handleStorageChange(obj) {
+    handleStorageChange(obj: any) {
         if (!obj.options) return;
         let {normal, gesture} = obj.options.newValue;
         if (normal.disabled || !normal.enableGesture) {
@@ -279,7 +261,7 @@ let gesture = {
         } else {
             this.initEvent();
         }
-        this.updateProp(Object.assign({}, normal, gesture));
+        this.updateProp({...normal, ...gesture});
     },
     initEvent() {
         let doc = document;
@@ -298,15 +280,15 @@ let gesture = {
         doc.removeEventListener("keydown", this.handleKeyEvent);
     },
     initSettings() {
-        chrome.storage.sync.get("options", obj => {
+        chrome.storage.sync.get("options", (obj: any) => {
             let {normal, gesture} = obj.options;
             if (!normal.disabled && normal.enableGesture) {
                 this.initEvent();
             }
-            this.updateProp(Object.assign({}, normal, gesture));
+            this.updateProp({...normal, ...gesture});
         });
     },
-    updateProp(props) {
+    updateProp(props: any) {
         this.minDis = props.minDis;
         this.expire = props.expire;
         this.expireSecond = props.expireSecond;

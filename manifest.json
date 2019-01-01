@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "description": "页面工具",
   "icons": {
-    "16": "images/icon_16.png",
-    "32": "images/icon_32.png",
-    "48": "images/icon_48.png",
-    "128": "images/icon_128.png"
+    "16": "icons/icon_16.png",
+    "32": "icons/icon_32.png",
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
   },
   "background": {
     "scripts": [
@@ -18,10 +18,10 @@
     "default_popup": "popup.html",
     "default_title": "页面工具",
     "default_icon": {
-      "16": "images/icon_16.png",
-      "32": "images/icon_32.png",
-      "48": "images/icon_48.png",
-      "128": "images/icon_128.png"
+      "16": "icons/icon_16.png",
+      "32": "icons/icon_32.png",
+      "48": "icons/icon_48.png",
+      "128": "icons/icon_128.png"
     }
   },
   "permissions": [
@@ -45,5 +45,5 @@
     }
   ],
   "options_page": "options.html",
-  "web_accessible_resources": ["images/*"]
+  "web_accessible_resources": ["images/*", "icons/*"]
 }

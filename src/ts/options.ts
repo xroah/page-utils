@@ -1,14 +1,18 @@
-function showMenu(evt) {
-    let btn = evt.currentTarget;
+import { EventProps } from "./interface/index";
+import {DIR_MAP, DIR_TEXT_MAP} from "./variables/constants"
+import "../sass/options.scss";
+
+function showMenu(evt: MouseEvent | {currentTarget: HTMLElement}) {
+    let btn = evt.currentTarget as HTMLElement;
     let aside = getById("aside");
     btn.classList.toggle("active");
     aside.classList.toggle("visible");
 }
 
-function handleChange(evt, type) {
-    let target = evt.target;
+function handleChange(evt: Event, type: string) {
+    let target = evt.target as HTMLInputElement;
     if (target.id === "mouseBtnSel") {
-        getOptions().then(opts => {
+        getOptions().then((opts: any) => {
             opts.gesture.button = +target.value;
             setOptions(opts);
         });
@@ -17,12 +21,12 @@ function handleChange(evt, type) {
     if (target.nodeName.toLowerCase() !== "input") return;
     if (target.type === "checkbox") {
         let checked = target.checked;
-        let ref = target.getAttribute("data-ref");
+        let ref: string | HTMLElement = target.getAttribute("data-ref");
         if (ref) {
             ref = getById(ref);
             checked ? ref.classList.remove("hidden") : ref.classList.add("hidden");
         }
-        getOptions().then(opts => {
+        getOptions().then((opts: any) => {
             if (target.id === "disable") {
                 opts.normal.disabled = !checked;
             } else {
@@ -36,7 +40,7 @@ function handleChange(evt, type) {
         if (valueEl) {
             valueEl.innerHTML = value;
         }
-        getOptions().then(opts => {
+        getOptions().then((opts: any) => {
             if(target.type === "color") {
                 opts[type][target.id] = value;
             } else {
@@ -47,11 +51,11 @@ function handleChange(evt, type) {
     }
 }
 
-function handleBasicChange(evt) {
+function handleBasicChange(evt: Event) {
     handleChange(evt, "normal");
 }
 
-function handleGestureChange(evt) {
+function handleGestureChange(evt: Event) {
     handleChange(evt, "gesture");
 }
 
@@ -61,14 +65,14 @@ function getOptions() {
     });
 }
 
-function setOptions(options) {
+function setOptions(options: any) {
     chrome.storage.sync.set({
         options
     });
 }
 
-function handleClick(evt) {
-    let tgt = evt.target;
+function handleClick(evt: MouseEvent) {
+    let tgt = evt.target as HTMLButtonElement;
     if (tgt.classList.contains("reset")) {
         chrome.runtime.sendMessage({
             type: "reset",
@@ -77,7 +81,7 @@ function handleClick(evt) {
     }
 }
 
-function handleMessage(evt, sender, sendResponse) {
+function handleMessage(evt: EventProps) {
     switch (evt.type) {
         case "resetSuccess":
             initSettings();
@@ -109,14 +113,14 @@ function handleHashChange() {
 }
 
 function updateView(hash = location.hash) {
-    let routerMap = {
+    let routerMap: any = {
         "#/basic": "basic",
         "#/gesture": "gesture",
         "#/about": "about"
     };
     let titleEl = getById("title");
     let viewId;
-    let links = document.querySelectorAll("#nav .router-link");
+    let links: Array<Node> = Array.from(document.querySelectorAll("#nav .router-link"));
     let currentView = document.querySelector(".view:not(.hidden)");
     if (hash in routerMap) {
         viewId = routerMap[hash];
@@ -129,50 +133,52 @@ function updateView(hash = location.hash) {
     }
     getById(viewId).classList.remove("hidden");
     for (let link of links) {
-        let parent = link.parentNode;
-        if (link.hash === hash) {
+        let l = link as HTMLAnchorElement;
+        let parent = link.parentNode as HTMLElement;
+        if (l.hash === hash) {
             parent.classList.add("active");
-            titleEl.innerHTML = link.innerHTML;
+            titleEl.innerHTML = l.innerHTML;
         } else {
             parent.classList.remove("active");
         }
     }
 }
 
-function getById(id) {
+function getById(id: string) {
     return document.getElementById(id);
 }
 
 function initSettings() {
-    chrome.storage.sync.get("options", obj => {
+    chrome.storage.sync.get("options", (obj: any) => {
         let { normal, gesture } = obj.options;
-        let disable = getById("disable");
-        let replaceNewTab = getById("replaceNewTab");
-        let enableGesture = getById("enableGesture");
-        let expireCheckbox = getById("expire");
+        let disable = getById("disable") as HTMLInputElement;
+        let replaceNewTab = getById("replaceNewTab") as HTMLInputElement;
+        let enableGesture = getById("enableGesture") as HTMLInputElement;
+        let expireCheckbox = getById("expire") as HTMLInputElement;
+        let expireSlider = getById("expireSlider");
         let expireValue = expireSlider.querySelector(".range-value");
-        let expireSecond = getById("expireSecond");
-        let minDisInput = getById("minDis");
+        let expireSecond = getById("expireSecond") as HTMLInputElement;
+        let minDisInput = getById("minDis") as HTMLInputElement;
         let minDisValue = getById("minDisValue");
-        let showTrack = getById("showTrack");
-        let trackColor = getById("trackColor");
-        let trackOpacity = getById("trackOpacity");
+        let showTrack = getById("showTrack") as HTMLInputElement;
+        let trackColor = getById("trackColor") as HTMLInputElement;
+        let trackOpacity = getById("trackOpacity") as HTMLInputElement;
         let trackOpacityValue = getById("trackOpacityValue");
-        let trackWidth = getById("trackWidth");
+        let trackWidth = getById("trackWidth") as HTMLInputElement;
         let trackWidthValue = getById("trackWidthValue");
-        let showHint = getById("showHint");
-        let hintBgColor = getById("hintBgColor");
-        let hintOpacity = getById("hintOpacity");
+        let showHint = getById("showHint") as HTMLInputElement;
+        let hintBgColor = getById("hintBgColor") as HTMLInputElement;
+        let hintOpacity = getById("hintOpacity") as HTMLInputElement;
         let hintOpacityValue = getById("hintOpacityValue");
-        let hintTextColor = getById("hintTextColor");
-        let mouseSel = getById("mouseBtnSel");
+        let hintTextColor = getById("hintTextColor") as HTMLInputElement;
+        let mouseSel = getById("mouseBtnSel") as HTMLSelectElement;
         disable.checked = !normal.disabled;
         replaceNewTab.checked = normal.replaceNewTab;
         enableGesture.checked = normal.enableGesture;
         expireSecond.value = expireValue.innerHTML = normal.expireSecond;
         minDisValue.innerHTML = minDisInput.value = normal.minDis;
         if (!(expireCheckbox.checked = normal.expire)) {
-            getById("expireSlider").classList.add("hidden");
+            expireSlider.classList.add("hidden");
         }
 
         if (!(showTrack.checked = gesture.showTrack)) {
@@ -193,6 +199,8 @@ function initSettings() {
 
 function initGestureView() {
     let keys = Object.keys(DIR_TEXT_MAP);
+    let dm = DIR_MAP as any;
+    let dtm = DIR_TEXT_MAP as any;
     let urlPrefix = chrome.runtime.getURL("");
     let frag = document.createDocumentFragment();
     let con = document.getElementById("gestureList");
@@ -204,10 +212,10 @@ function initGestureView() {
         let dirs = k.split("");
         for (let d of dirs) {
             let img = new Image();
-            img.src = `${urlPrefix}${DIR_MAP[d]}`;
+            img.src = `${urlPrefix}${dm[d]}`;
             dt.appendChild(img);
         }
-        dd.innerHTML = DIR_TEXT_MAP[k];
+        dd.innerHTML = dtm[k];
         dl.appendChild(dt);
         dl.appendChild(dd);
         div.appendChild(dl);
