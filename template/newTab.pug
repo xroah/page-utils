@@ -14,10 +14,10 @@ html
         section.main-container
             p#sentence.daily-sentence.scale-invisible
             .search-wrapper
-                - var engines = {"百度": "https://www.baidu.com/s?wd=","必应": "https://cn.bing.com/search?q=","搜狗": "https://www.sogou.com/web?query=","360": "https://www.so.com/s?q=","谷歌": "https://www.google.com/search?q="}
+                - var engines = [{name: "百度", url: "https://www.baidu.com/s?wd="}, {name: "必应", url: "https://cn.bing.com/search?q=",}, {name: "搜狗", url: "https://www.sogou.com/web?query="}, {name: "360", url: "https://www.so.com/s?q="}, {name: "谷歌", url: "https://www.google.com/search?q="}]
                 select#searchEngine.search-engine
-                    each val, key in engines
-                        option(value=val) #{key}
+                    each val in engines
+                        option(value=val.url) #{val.name}
                 input#keywords.keywords(type="text")
                 button#search.search(type="button")
             #articles.article-list
