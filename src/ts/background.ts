@@ -47,7 +47,6 @@ function switchTab(dir: string) {
 }
 
 function handleReset(type: "normal" | "gesture") {
-    console.log(type)
     chrome.storage.sync.get("options", (obj: any) => {
         let options = obj.options;
         options[type] = defaultOptions[type];
