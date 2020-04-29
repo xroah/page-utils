@@ -1,2 +1,2 @@
-# pageUtils
-A chrome extension
+# page-utils
+An chrome extension
