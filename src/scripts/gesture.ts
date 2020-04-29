@@ -1,5 +1,5 @@
 import {DIR_MAP, DIR_TEXT_MAP} from "./variables/constants";
-import "../sass/gesture.scss";
+import "../styles/gesture.scss";
 
 let gesture: any = {
     mouseDown: false,

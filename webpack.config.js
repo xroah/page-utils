@@ -8,7 +8,7 @@ const path = require("path");
 let context = path.resolve(__dirname);
 
 function getEntries() {
-    let dir = "./src/ts";
+    let dir = "./src/scripts";
     let entries = fs.readdirSync(dir);
     let ret = {};
 
@@ -88,7 +88,7 @@ let cfg = {
     entry: getEntries(),
     output: {
         path: `${context}/dist`,
-        filename: "js/[name].js"
+        filename: "scripts/[name].js"
     },
     stats: "minimal",
     resolve: {
@@ -131,7 +131,7 @@ plugins.push(
         to: "manifest.json"
     }]),
     new MiniCssPlugin({
-        filename: "css/[name].css"
+        filename: "styles/[name].css"
     })
 );
 

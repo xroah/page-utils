@@ -1,6 +1,6 @@
 import { EventProps } from "./interface/index";
 import {DIR_MAP, DIR_TEXT_MAP} from "./variables/constants"
-import "../sass/options.scss";
+import "../styles/options.scss";
 
 function showMenu(evt: MouseEvent | {currentTarget: HTMLElement}) {
     let btn = evt.currentTarget as HTMLElement;
