@@ -11,6 +11,7 @@ function getEntries() {
     let dir = "./src/ts";
     let entries = fs.readdirSync(dir);
     let ret = {};
+
     for (let file of entries) {
         let f = `${dir}/${file}`;;
         let stat = fs.statSync(f);
@@ -18,6 +19,7 @@ function getEntries() {
         let name = path.parse(file).name;
         ret[name] = f;
     }
+
     return ret;
 }
 
@@ -25,14 +27,16 @@ function getTemplate() {
     let dir = "template";
     return fs.readdirSync(dir).filter(f => {
         let stat = fs.statSync(`${dir}/${f}`);
+
         return stat.isFile();
     }).map(f => {
         let name = path.parse(f).name;
         let chunks = [name];
-        chunks.push(name);
+
         if (name !== "popup") {
             chunks.push("gesture");
         }
+
         return new HtmlWebpackPlugin({
             filename: `${name}.html`,
             template: `${dir}/${f}`,
@@ -42,30 +46,36 @@ function getTemplate() {
     });
 }
 
-function getAbsPathFile(dir) {
+function readdir(dir) {
     if (path.isAbsolute(dir)) {
         dir = path.resolve(dir);
     }
+
     return fs.readdirSync(dir).map(p => `${dir}/${p}`);
 }
 
 function rmDir(dir) {
     dir = path.resolve(dir);
-    if (!fs.existsSync(dir)) return;
-    let stat = fs.statSync(dir);
-    if (stat.isFile()) return;
+
+    if (
+        !fs.existsSync(dir) ||
+        !fs.lstatSync(dir).isDirectory()
+    ) return;
+
     let dirs = [dir];
-    let files = getAbsPathFile(dir);
+    let files = readdir(dir);
+
     while (files.length) {
         let f = files.pop();
         stat = fs.statSync(f);
         if (stat.isDirectory()) {
-            files.push(...getAbsPathFile(f));
+            files.push(...readdir(f));
             dirs.push(path.resolve(f));
         } else {
             fs.unlinkSync(f);
         }
     }
+
     while (dirs.length) {
         fs.rmdirSync(dirs.pop());
     }
@@ -74,8 +84,7 @@ function rmDir(dir) {
 let plugins = getTemplate();
 
 let cfg = {
-    mode: "production",
-    devtool: "source-map",
+    mode: "development",
     entry: getEntries(),
     output: {
         path: `${context}/dist`,
