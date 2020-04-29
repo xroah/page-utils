@@ -90,9 +90,11 @@ let cfg = {
         path: `${context}/dist`,
         filename: "js/[name].js"
     },
+    stats: "minimal",
     resolve: {
         extensions: [".js", ".ts"]
     },
+    devtool: "cheap-source-map",
     module: {
         rules: [{
             test: /\.ts$/,
@@ -137,4 +139,8 @@ rmDir("dist");
 
 cfg.plugins = plugins;
 
-module.exports = cfg;
+module.exports = env => {
+    cfg.mode = env;
+
+    return cfg;
+};

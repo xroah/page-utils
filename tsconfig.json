@@ -1,15 +1,15 @@
 {
-  "compilerOptions": {
-    "outDir": "./dist/",
-    "sourceMap": true,
-    "noImplicitAny": true,
-    "module": "es6",
-    "target": "es6",
-    "types": [
-      "chrome"
+    "compilerOptions": {
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "ES6",
+        "moduleResolution": "Node",
+        "target": "ES5",
+        "types": [
+            "chrome"
+        ]
+    },
+    "include": [
+        "./src/**/*"
     ]
-  },
-  "include": [
-    "./src/**/*"
-  ]
 }
