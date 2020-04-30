@@ -12,54 +12,57 @@ chrome.contextMenus.create({
 });
 
 function switchTab(dir: string) {
-    chrome.windows.getCurrent((window: chrome.windows.Window) => {
-        chrome.tabs.query({
-            windowId: window.id
-        }, (tabs: Array<chrome.tabs.Tab>) => {
-            let len: number = tabs.length;
-            let index:number = 0;
-            let tab: chrome.tabs.Tab;
-            for (let i = 0; i < len; i++) {
-                if (tabs[i].active) {
-                    index = i;
-                    break;
-                }
+    chrome.tabs.query({
+        windowId: chrome.windows.WINDOW_ID_CURRENT
+    }, (tabs: Array<chrome.tabs.Tab>) => {
+        let len: number = tabs.length;
+        let index: number = 0;
+        let tab: chrome.tabs.Tab;
+
+        for (let i = 0; i < len; i++) {
+            if (tabs[i].active) {
+                index = i;
+                break;
             }
-            if (dir === "left") {
-                if (index === 0) {
-                    index = len - 1;
-                } else {
-                    index -= 1;
-                }
+        }
+
+        if (dir === "left") {
+            if (index === 0) {
+                index = len - 1;
             } else {
-                if (index === len - 1) {
-                    index = 0;
-                } else {
-                    index += 1;
-                }
+                index -= 1;
             }
-            tab = tabs[index];
-            chrome.tabs.update(tab.id, {
-                active: true
-            });
+        } else {
+            if (index === len - 1) {
+                index = 0;
+            } else {
+                index += 1;
+            }
+        }
+
+        tab = tabs[index];
+
+        chrome.tabs.update(tab.id, {
+            active: true
         });
-    })
+    });
 }
 
 function handleReset(type: "normal" | "gesture") {
     chrome.storage.sync.get("options", (obj: any) => {
         let options = obj.options;
         options[type] = defaultOptions[type];
+
         chrome.storage.sync.set({
             options
         });
-        chrome.runtime.sendMessage({type: "resetSuccess"});
+        chrome.runtime.sendMessage({ type: "resetSuccess" });
     })
 }
 
 function executeGesture(message: string) {
     switch (message) {
-        case "dr": //关闭标签
+        case "dr": //close the tab
             chrome.tabs.query({
                 active: true,
                 currentWindow: true
@@ -67,44 +70,28 @@ function executeGesture(message: string) {
                 chrome.tabs.remove(tabs[0].id);
             });
             break;
-        case "dl": //新建标签
+        case "dl": //new tab
             chrome.tabs.create({
                 active: true
             });
             break;
-        case "lu"://重新打开关闭的标签或者窗口
+        case "lu"://reopen tab or window
             chrome.sessions.restore();
             break;
-        case "ul": //左侧标签
+        case "ul": //left tab
             switchTab("left");
             break;
-        case "ur": //右侧标签
+        case "ur": //right tab
             switchTab("right");
             break;
-        case "dru": //新建窗口
+        case "dru": //new window
             chrome.windows.create();
             break;
-        case "urd": //关闭窗口
+        case "urd": //close the window
             chrome.windows.getCurrent((win: chrome.windows.Window) => {
                 chrome.windows.remove(win.id);
             });
             break;
-    }
-}
-
-function replaceNewTab(tab: chrome.tabs.Tab) {
-    if (tab.url === "chrome://newtab/") {
-        chrome.storage.sync.get("options", (obj: any) => {
-            let {normal} = obj.options;
-            if (!normal.disabled && normal.replaceNewTab) {
-                chrome.tabs.update(
-                    tab.id,
-                    {
-                        url: chrome.runtime.getURL("") + "newTab.html"
-                    }
-                );
-            }
-        });
     }
 }
 
@@ -120,8 +107,6 @@ function handleMessage(evt: EventProps) {
 }
 
 chrome.runtime.onMessage.addListener(handleMessage);
-chrome.tabs.onCreated.addListener(replaceNewTab);
-chrome.tabs.onUpdated.addListener( (tabId: number, tab: chrome.tabs.Tab) => replaceNewTab(tab));
 
 chrome.runtime.onInstalled.addListener((detail: chrome.runtime.InstalledDetails) => {
     if (detail.reason === "install") {
