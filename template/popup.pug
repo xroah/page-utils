@@ -4,4 +4,36 @@ html
         meta(charset="utf-8")
         title popup
     body
-        img#qrCode
+        include ./mixins/checkbox
+
+        .main-container.popup-container
+            .row
+                h3.heading 页面二维码
+            .row
+                button#showPageQRCode.mb-10.btn.btn-primary 显示页面二维码
+            .row.d-none
+                img#qrCode
+            .row 
+                h3.heading 缓存清理
+            .row 
+                span.mr-10 时间范围:
+                select#timeRange.form-control
+                    option(value="h") 1小时内
+                    option(value="d") 1天内
+                    option(value="w") 1周内
+                    option(value="m") 4周内
+                    option(value="a") 所有
+            .row 
+                +checkbox("onlyCurrent", "只清理当前站点(chrome74+)")
+            .row 
+                +checkbox("history", "历史记录")
+            .row 
+                +checkbox("cache", "缓存")
+            .row 
+                +checkbox("cookie", "cookies和其他数据")
+            .row 
+                +checkbox("password", "保存的密码")
+            .row 
+                +checkbox("download", "下载记录")
+            .row
+                button#clear.btn.btn-primary 清理

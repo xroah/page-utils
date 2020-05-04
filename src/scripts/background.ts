@@ -1,16 +1,6 @@
 import defaultOptions from "./variables/defaultOptions";
 import { EventProps } from "./interface/index";
 
-chrome.contextMenus.create({
-    title: "下载",
-    contexts: ["image"],
-    onclick(img: chrome.contextMenus.OnClickData) {
-        chrome.downloads.download({
-            url: img.srcUrl
-        });
-    }
-});
-
 function switchTab(dir: string) {
     chrome.windows.getCurrent((window: chrome.windows.Window) => {
         chrome.tabs.query({

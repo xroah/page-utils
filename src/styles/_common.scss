@@ -35,6 +35,7 @@ input {
 select {
     padding: 5px 10px;
     vertical-align: middle;
+    background-color: transparent;
 }
 
 .font-bold {
@@ -191,20 +192,63 @@ select {
         color: #096dd9;
         border-color: #096dd9;
     }
+
+    &.btn-primary {
+        color: #fff;
+        background-color: #1890ff;
+        border-color: #1890ff;
+    
+        &:hover {
+            background-color: #40a9ff;
+        }
+    
+        &:active {
+            background-color: #096dd9;
+        }
+    }
+
+    &:disabled,
+    &:disabled:hover,
+    &:disabled:active {
+        color: #666;
+        background-color: #f2f2f2;
+        border-color: transparent;
+        cursor: not-allowed;
+    }
 }
 
-.btn-primary {
-    color: #fff !important;
-    background-color: #1890ff;
-    border-color: #1890ff;
+.d-flex {
+    display: flex;
+}
 
-    &:hover {
-        background-color: #40a9ff;
-    }
+.d-none {
+    display: none;
+}
 
-    &:active {
-        background-color: #096dd9;
-    }
+.justify-center {
+    justify-content: center;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.ml-10 {
+    margin-left: 10px;
+}
+
+.mr-10 {
+    margin-right: 10px;
+}
+
+.heading {
+    padding-bottom: 5px;
+    border-bottom: 1px solid #333;
+    margin: 10px 0;
 }
 
 .transition {
