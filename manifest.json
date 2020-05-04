@@ -32,6 +32,7 @@
     "downloads",
     "webRequest",
     "webRequestBlocking",
+    "browsingData",
     "http://*/*",
     "https://*/*"
   ],
