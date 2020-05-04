@@ -47,10 +47,11 @@ function switchTab(dir: string) {
 }
 
 function handleReset(type: "normal" | "gesture") {
-    chrome.storage.sync.get("options", (obj: any) => {
+    chrome.storage.local.get("options", (obj: any) => {
         let options = obj.options;
         options[type] = defaultOptions[type];
-        chrome.storage.sync.set({
+        
+        chrome.storage.local.set({
             options
         });
         chrome.runtime.sendMessage({type: "resetSuccess"});
@@ -92,22 +93,6 @@ function executeGesture(message: string) {
     }
 }
 
-function replaceNewTab(tab: chrome.tabs.Tab) {
-    if (tab.url === "chrome://newtab/") {
-        chrome.storage.sync.get("options", (obj: any) => {
-            let {normal} = obj.options;
-            if (!normal.disabled && normal.replaceNewTab) {
-                chrome.tabs.update(
-                    tab.id,
-                    {
-                        url: chrome.runtime.getURL("") + "newTab.html"
-                    }
-                );
-            }
-        });
-    }
-}
-
 function handleMessage(evt: EventProps) {
     switch (evt.type) {
         case "executeGesture":
@@ -120,12 +105,10 @@ function handleMessage(evt: EventProps) {
 }
 
 chrome.runtime.onMessage.addListener(handleMessage);
-chrome.tabs.onCreated.addListener(replaceNewTab);
-chrome.tabs.onUpdated.addListener( (tabId: number, tab: chrome.tabs.Tab) => replaceNewTab(tab));
 
 chrome.runtime.onInstalled.addListener((detail: chrome.runtime.InstalledDetails) => {
     if (detail.reason === "install") {
-        chrome.storage.sync.set({
+        chrome.storage.local.set({
             options: defaultOptions
         });
     }

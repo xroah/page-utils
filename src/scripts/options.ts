@@ -5,47 +5,49 @@ import "../styles/options.scss";
 function showMenu(evt: MouseEvent | {currentTarget: HTMLElement}) {
     let btn = evt.currentTarget as HTMLElement;
     let aside = getById("aside");
+
     btn.classList.toggle("active");
     aside.classList.toggle("visible");
 }
 
 function handleChange(evt: Event, type: string) {
     let target = evt.target as HTMLInputElement;
-    if (target.id === "mouseBtnSel") {
-        getOptions().then((opts: any) => {
-            opts.gesture.button = +target.value;
-            setOptions(opts);
-        });
-        return;
-    }
+
     if (target.nodeName.toLowerCase() !== "input") return;
+
     if (target.type === "checkbox") {
         let checked = target.checked;
         let ref: string | HTMLElement = target.getAttribute("data-ref");
+
         if (ref) {
             ref = getById(ref);
             checked ? ref.classList.remove("hidden") : ref.classList.add("hidden");
         }
+
         getOptions().then((opts: any) => {
             if (target.id === "disable") {
                 opts.normal.disabled = !checked;
             } else {
                 opts[type][target.id] = checked;
             }
+
             setOptions(opts);
         });
     } else {
         let valueEl = target.nextElementSibling;
         let value = target.value;
+
         if (valueEl) {
             valueEl.innerHTML = value;
         }
+
         getOptions().then((opts: any) => {
             if(target.type === "color") {
                 opts[type][target.id] = value;
             } else {
                 opts[type][target.id] = +value;
             }
+
             setOptions(opts);
         });
     }
@@ -61,18 +63,19 @@ function handleGestureChange(evt: Event) {
 
 function getOptions() {
     return new Promise(resolve => {
-        chrome.storage.sync.get("options", obj => resolve(obj.options));
+        chrome.storage.local.get("options", obj => resolve(obj.options));
     });
 }
 
 function setOptions(options: any) {
-    chrome.storage.sync.set({
+    chrome.storage.local.set({
         options
     });
 }
 
 function handleClick(evt: MouseEvent) {
     let tgt = evt.target as HTMLButtonElement;
+
     if (tgt.classList.contains("reset")) {
         chrome.runtime.sendMessage({
             type: "reset",
@@ -149,7 +152,7 @@ function getById(id: string) {
 }
 
 function initSettings() {
-    chrome.storage.sync.get("options", (obj: any) => {
+    chrome.storage.local.get("options", (obj: any) => {
         let { normal, gesture } = obj.options;
         let disable = getById("disable") as HTMLInputElement;
         let replaceNewTab = getById("replaceNewTab") as HTMLInputElement;
@@ -171,12 +174,12 @@ function initSettings() {
         let hintOpacity = getById("hintOpacity") as HTMLInputElement;
         let hintOpacityValue = getById("hintOpacityValue");
         let hintTextColor = getById("hintTextColor") as HTMLInputElement;
-        let mouseSel = getById("mouseBtnSel") as HTMLSelectElement;
         disable.checked = !normal.disabled;
         replaceNewTab.checked = normal.replaceNewTab;
         enableGesture.checked = normal.enableGesture;
         expireSecond.value = expireValue.innerHTML = normal.expireSecond;
         minDisValue.innerHTML = minDisInput.value = normal.minDis;
+
         if (!(expireCheckbox.checked = normal.expire)) {
             expireSlider.classList.add("hidden");
         }
@@ -184,16 +187,18 @@ function initSettings() {
         if (!(showTrack.checked = gesture.showTrack)) {
             getById("trackWrapper").classList.add("hidden");
         }
+
         trackColor.value = gesture.trackColor;
         trackOpacity.value = trackOpacityValue.innerHTML = gesture.trackOpacity;
         trackWidth.value = trackWidthValue.innerHTML = gesture.trackWidth;
+
         if (!(showHint.checked = gesture.showHint)) {
             getById("hintWrapper").classList.add("hidden");
         }
+
         hintBgColor.value = gesture.hintBgColor;
         hintOpacity.value = hintOpacityValue.innerHTML = gesture.hintOpacity;
         hintTextColor.value = gesture.hintTextColor;
-        mouseSel.value = gesture.button;
     });
 }
 
@@ -204,6 +209,7 @@ function initGestureView() {
     let urlPrefix = chrome.runtime.getURL("");
     let frag = document.createDocumentFragment();
     let con = document.getElementById("gestureList");
+
     for (let k of keys) {
         let div = document.createElement("div");
         let dl = document.createElement("dl");
@@ -221,6 +227,7 @@ function initGestureView() {
         div.appendChild(dl);
         frag.appendChild(div);
     }
+
     con.appendChild(frag);
 }
 

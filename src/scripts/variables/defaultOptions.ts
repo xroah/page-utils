@@ -6,9 +6,9 @@ export default {
         showHint: true,
         replaceNewTab: false,
         enableGesture: true,
-        expire: false, //是否超时取消
-        expireSecond: 2, //超时取消时间
-        minDis: 10, //手势生效的最小长度
+        expire: false, 
+        expireSecond: 2, 
+        minDis: 10
     },
     gesture: {
         showTrack: true,
@@ -18,7 +18,6 @@ export default {
         showHint: true,
         hintBgColor: "#1998ff",
         hintTextColor: "#ffffff",
-        hintOpacity: 1,
-        button: 2
+        hintOpacity: 1
     }
 }
