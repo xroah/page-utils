@@ -1,4 +1,5 @@
-import { DIR_MAP, DIR_TEXT_MAP } from "./variables/constants";
+import { DIR_MAP } from "./variables/constants";
+import { page } from "./gestureFunctions";
 import "../styles/gesture.scss";
 
 let gesture: any = {
@@ -28,6 +29,7 @@ let gesture: any = {
     expireSecond: 2,
     cancelTimer: null,
     button: 2,
+    dirTextMap: {},
     preventContextMenu: false,
     setAttrs(el: HTMLElement, attributes: any) {
         for (let key in attributes) {
@@ -70,11 +72,6 @@ let gesture: any = {
         pos.x = evt.clientX;
         pos.y = evt.clientY;
         this.positions.push(`${pos.x} ${pos.y}`);
-
-        if (this.cancelScroll) {
-            cancelAnimationFrame(this.cancelScroll);
-            this.cancelScroll = null;
-        }
     },
     handleContextMenu(evt: MouseEvent) {
         if (this.preventContextMenu) {
@@ -197,72 +194,25 @@ let gesture: any = {
         let dirWrapper = this.wrapper.querySelector(".dir-wrapper");
         let textWrapper = this.wrapper.querySelector(".text-wrapper");
         let dirMap = DIR_MAP as any;
-        let dirTextMap = DIR_TEXT_MAP as any;
+        let dirTextMap = this.dirTextMap as any;
         let img = new Image();
         img.src = chrome.runtime.getURL("") + dirMap[dir];
         dirWrapper.appendChild(img);
-        textWrapper.innerHTML = dirTextMap[this.dirs.join("")] || "";
-
-        return this;
-    },
-    scrollTo(pos: number) {
-        const scroll = () => {
-            const sTop = document.documentElement.scrollTop;
-            const dis = Math.floor((pos - sTop) / 10);
-            const absDis = Math.abs(dis);
-            let _dis = dis;
-
-            if (absDis > 0) {
-                this.cancelScroll = requestAnimationFrame(scroll);
-
-                if (absDis < 10) {
-                    _dis = dis < 0 ? -10 : 10;
-                }
-
-                window.scrollTo(0, sTop + _dis);
-            } else {
-                window.scrollTo(0, pos);
-            }
-        };
-
-        scroll();
+        textWrapper.innerHTML = (dirTextMap[this.dirs.join("")] || {}).text || "";
 
         return this;
     },
     execute() {
         const dirs = this.dirs.join("");
-        const sTop = document.documentElement.scrollTop;
-        const winH = window.innerHeight;
+        const gesture = this.dirTextMap[dirs];
 
-        if (dirs) {
-            switch (dirs) {
-                case "l": //back
-                    history.back();
-                    break;
-                case "r": //forward
-                    history.forward();
-                    break;
-                case "ud": //refresh
-                    location.reload();
-                    break;
-                case "udu": //force refresh
-                    location.reload(true);
-                    break;
-                case "u": //scroll up
-                    this.scrollTo(sTop - winH);
-                    break;
-                case "d": //scroll  down
-                    this.scrollTo(sTop + winH);
-                    break;
-                case "rd"://to bottom
-                    this.scrollTo(document.body.scrollHeight - winH);
-                    break;
-                case "ru": //to top
-                    this.scrollTo(0);
-                    break;
-                default: //others need invoke chrome api
-                    chrome.runtime.sendMessage({ type: "executeGesture", message: dirs });
-            }
+        if (!gesture) return this;
+
+        if (gesture.action in page) {
+            (page[gesture.action])();
+        } else {
+            //others need invoke chrome api
+            chrome.runtime.sendMessage({ type: "executeGesture", message: gesture.action });
         }
 
         return this;
@@ -288,12 +238,11 @@ let gesture: any = {
         let { normal, gesture } = obj.options.newValue;
 
         this.removeEvent();
+        this.updateProp({ ...normal, ...gesture });
 
         if (!normal.disabled && normal.enableGesture) {
             this.initEvent();
         }
-
-        this.updateProp({ ...normal, ...gesture });
     },
     initEvent() {
         let doc = document;
@@ -315,11 +264,12 @@ let gesture: any = {
         chrome.storage.local.get("options", (obj: any) => {
             let { normal, gesture } = obj.options;
 
+            this.removeEvent();
+
             if (!normal.disabled && normal.enableGesture) {
                 this.initEvent();
+                this.updateProp({ ...normal, ...gesture });
             }
-
-            this.updateProp({ ...normal, ...gesture });
         });
     },
     updateProp(props: any) {
@@ -334,6 +284,7 @@ let gesture: any = {
         this.hintBgColor = props.hintBgColor;
         this.hintOpacity = props.hintOpacity;
         this.hintTextColor = props.hintTextColor;
+        this.dirTextMap = props.actions;
     },
     init() {
         this.handleMousedown = this.handleMousedown.bind(this);
@@ -341,8 +292,9 @@ let gesture: any = {
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleKeyEvent = this.handleKeyEvent.bind(this);
-        chrome.storage.onChanged.addListener(this.handleStorageChange.bind(this));
         this.initSettings();
+
+        chrome.storage.onChanged.addListener(this.handleStorageChange.bind(this));
     }
 };
 

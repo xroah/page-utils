@@ -1,4 +1,5 @@
 @import "./common";
+
 body {
     overflow: hidden;
 }
@@ -114,7 +115,7 @@ body {
         }
     }
 
-    > p:first-child {
+    >p:first-child {
         line-height: 50px;
         padding-left: 15px;
         font-size: 18px;
@@ -142,13 +143,12 @@ body {
     padding: 5px 0;
     overflow: hidden;
 
-    > div {
+    >div {
         padding: 5px 0;
     }
 }
 
-.slider-wrapper
-.color-input {
+.slider-wrapper .color-input {
     width: 80px;
 }
 
@@ -162,13 +162,13 @@ body {
     flex: 1;
     margin-left: 20px;
 
-    img {
-        background-color: rgba(25, 152, 255, .8);
-    }
-
-    > div {
+    .gesture-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         width: 200px;
-        padding: 10px;
+        height: 90px;
+        padding: 0 10px;
         margin: 10px;
         border: 1px solid #f2f2f2;
         transition: all .3s;
@@ -177,6 +177,114 @@ body {
             transform: translateY(-5%);
             box-shadow: 5px 5px 5px 0 rgba(0, 0, 0, .2);
         }
+
+        dd {
+            margin-top: 8px;
+        }
+    }
+
+    .add-gesture {
+        align-items: center;
+        border-style: dashed;
+        background: url(../images/add.svg) no-repeat center center / 50px 50px;
+        cursor: pointer;
+    }
+}
+
+.gesture-list,
+.new-gesture-wrapper {
+    img {
+        background-color: rgba(25, 152, 255, .8);
+    }
+}
+
+.gesture-item {
+    position: relative;
+
+    .operation-wrapper {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        opacity: 0;
+        transition: all .3s;
+    }
+
+    .operation-btn {
+        $size: 18px;
+
+        border: none;
+        width: $size;
+        height: $size;
+        line-height: $size;
+        text-align: center;
+        padding: 0;
+        border-radius: 50%;
+        color: #fff;
+        background: url(../images/close.svg) no-repeat center center / 16px 16px rgba(255, 0, 0, .5);
+        cursor: pointer;
+        font-size: 20px;
+
+        &:hover {
+            background-color: rgba(255, 0, 0, .6);
+        }
+
+        &:active {
+            background-color: rgba(255, 0, 0, .8);
+        }
+
+        &.edit-gesture {
+            background-size: 12px 12px;
+            background-image: url(../images/edit.svg);
+            background-color: #1998ff;
+        }
+    }
+
+    &:hover {
+        .operation-wrapper {
+            opacity: 1;
+        }
+    }
+}
+
+.gesture-popup {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, .3);
+    z-index: 10;
+    transition: all .3s;
+    transform: translateY(-1000px);
+    opacity: 0;
+
+    &.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .new-gesture-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 720px;
+        height: 600px;
+        margin-top: 30px;
+        padding: 10px;
+        background-color: #fff;
+    }
+
+    .draw-gesture-wrapper {
+        flex: 1;
+        margin: 10px 0;
+        border: 1px dashed #333;
+    }
+
+    .new-gestures {
+        align-items: center;
+        height: 40px;
     }
 }
 

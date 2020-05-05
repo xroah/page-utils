@@ -1,8 +1,13 @@
 import { EventProps } from "./interface/index";
-import {DIR_MAP, DIR_TEXT_MAP} from "./variables/constants"
+import {
+    getById,
+    getOptions,
+    setOptions
+} from "./utils";
+import gestureSettings from "./gestureSettings";
 import "../styles/options.scss";
 
-function showMenu(evt: MouseEvent | {currentTarget: HTMLElement}) {
+function showMenu(evt: MouseEvent | { currentTarget: HTMLElement }) {
     let btn = evt.currentTarget as HTMLElement;
     let aside = getById("aside");
 
@@ -42,7 +47,7 @@ function handleChange(evt: Event, type: string) {
         }
 
         getOptions().then((opts: any) => {
-            if(target.type === "color") {
+            if (target.type === "color") {
                 opts[type][target.id] = value;
             } else {
                 opts[type][target.id] = +value;
@@ -61,26 +66,16 @@ function handleGestureChange(evt: Event) {
     handleChange(evt, "gesture");
 }
 
-function getOptions() {
-    return new Promise(resolve => {
-        chrome.storage.local.get("options", obj => resolve(obj.options));
-    });
-}
-
-function setOptions(options: any) {
-    chrome.storage.local.set({
-        options
-    });
-}
-
 function handleClick(evt: MouseEvent) {
     let tgt = evt.target as HTMLButtonElement;
 
     if (tgt.classList.contains("reset")) {
-        chrome.runtime.sendMessage({
-            type: "reset",
-            message: tgt.dataset.type
-        });
+        if (confirm("确定要恢复默认设置吗？")) {
+            chrome.runtime.sendMessage({
+                type: "reset",
+                message: tgt.dataset.type
+            });
+        }
     }
 }
 
@@ -96,11 +91,14 @@ function initEvent() {
     let showMenuBtn = getById("showMenuBtn");
     let basic = getById("basic");
     let gesture = getById("gesture");
+    let cancelAdd = getById("cancelAddGesture");
+
     showMenuBtn.addEventListener("click", showMenu);
     window.addEventListener("hashchange", handleHashChange);
     basic.addEventListener("change", handleBasicChange);
     gesture.addEventListener("change", handleGestureChange);
     document.addEventListener("click", handleClick);
+    cancelAdd.addEventListener("click", gestureSettings.hideGestureDialog);
     chrome.runtime.onMessage.addListener(handleMessage);
 }
 
@@ -134,7 +132,9 @@ function updateView(hash = location.hash) {
     if (currentView) {
         currentView.classList.add("hidden");
     }
+
     getById(viewId).classList.remove("hidden");
+
     for (let link of links) {
         let l = link as HTMLAnchorElement;
         let parent = link.parentNode as HTMLElement;
@@ -145,17 +145,20 @@ function updateView(hash = location.hash) {
             parent.classList.remove("active");
         }
     }
-}
 
-function getById(id: string) {
-    return document.getElementById(id);
+    if (viewId === "gesture") {
+        const el = getById("drawGestureWrapper");
+        const svg = getById("gestureTrack");
+
+        svg.setAttribute("width", `${el.offsetWidth}`);
+        svg.setAttribute("height", `${el.offsetHeight}`);
+    }
 }
 
 function initSettings() {
     chrome.storage.local.get("options", (obj: any) => {
         let { normal, gesture } = obj.options;
         let disable = getById("disable") as HTMLInputElement;
-        let replaceNewTab = getById("replaceNewTab") as HTMLInputElement;
         let enableGesture = getById("enableGesture") as HTMLInputElement;
         let expireCheckbox = getById("expire") as HTMLInputElement;
         let expireSlider = getById("expireSlider");
@@ -174,8 +177,8 @@ function initSettings() {
         let hintOpacity = getById("hintOpacity") as HTMLInputElement;
         let hintOpacityValue = getById("hintOpacityValue");
         let hintTextColor = getById("hintTextColor") as HTMLInputElement;
+
         disable.checked = !normal.disabled;
-        replaceNewTab.checked = normal.replaceNewTab;
         enableGesture.checked = normal.enableGesture;
         expireSecond.value = expireValue.innerHTML = normal.expireSecond;
         minDisValue.innerHTML = minDisInput.value = normal.minDis;
@@ -199,41 +202,13 @@ function initSettings() {
         hintBgColor.value = gesture.hintBgColor;
         hintOpacity.value = hintOpacityValue.innerHTML = gesture.hintOpacity;
         hintTextColor.value = gesture.hintTextColor;
+
+        gestureSettings.initGestureView(gesture.actions);
     });
-}
-
-function initGestureView() {
-    let keys = Object.keys(DIR_TEXT_MAP);
-    let dm = DIR_MAP as any;
-    let dtm = DIR_TEXT_MAP as any;
-    let urlPrefix = chrome.runtime.getURL("");
-    let frag = document.createDocumentFragment();
-    let con = document.getElementById("gestureList");
-
-    for (let k of keys) {
-        let div = document.createElement("div");
-        let dl = document.createElement("dl");
-        let dt = document.createElement("dt");
-        let dd = document.createElement("dd");
-        let dirs = k.split("");
-        for (let d of dirs) {
-            let img = new Image();
-            img.src = `${urlPrefix}${dm[d]}`;
-            dt.appendChild(img);
-        }
-        dd.innerHTML = dtm[k];
-        dl.appendChild(dt);
-        dl.appendChild(dd);
-        div.appendChild(dl);
-        frag.appendChild(div);
-    }
-
-    con.appendChild(frag);
 }
 
 function init() {
     initSettings();
-    initGestureView();
     initEvent();
     updateView();
 }

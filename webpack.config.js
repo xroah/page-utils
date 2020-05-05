@@ -33,7 +33,7 @@ function getTemplate() {
         let name = path.parse(f).name;
         let chunks = [name];
 
-        if (name !== "popup") {
+        if (name === "newTab") {
             chunks.push("gesture");
         }
 
