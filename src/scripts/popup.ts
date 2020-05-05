@@ -4,7 +4,7 @@ import "../styles/popup.scss";
 const img = document.getElementById("qrCode") as HTMLImageElement;
 const btn = document.getElementById("showPageQRCode") as HTMLButtonElement;
 const clearBtn = document.getElementById("clear") as HTMLButtonElement;
-const current = document.getElementById("onlyCurrent") as HTMLInputElement;
+const currentEl = document.getElementById("onlyCurrent") as HTMLInputElement;
 const historyEl = document.getElementById("history") as HTMLInputElement;
 const cacheEl = document.getElementById("cache") as HTMLInputElement;
 const cookieEl = document.getElementById("cookie") as HTMLInputElement;
@@ -13,13 +13,22 @@ const downloadEl = document.getElementById("download") as HTMLInputElement;
 const timeRangeEl = document.getElementById("timeRange") as HTMLSelectElement;
 const OPTIONS_KEY = "clearOptions";
 
+//read saved options
 chrome.storage.local.get(OPTIONS_KEY, (opts: any = {}) => {
+    opts = opts[OPTIONS_KEY] || {};
     historyEl.checked = !!opts.history;
     cacheEl.checked = !!opts.cache;
     cookieEl.checked = !!opts.cookie;
     passwordEl.checked = !!opts.password;
     downloadEl.checked = !!opts.download;
+    currentEl.checked = !!opts.current;
+    timeRangeEl.value = opts.timeRange;
 
+    if (timeRangeEl.selectedIndex === -1) {
+        timeRangeEl.selectedIndex = 0;
+    }
+
+    switchCheckbox();
 });
 
 btn.addEventListener("click", function () {
@@ -48,13 +57,17 @@ btn.addEventListener("click", function () {
 });
 
 function switchCheckbox() {
-    downloadEl.disabled = current.checked;
-    historyEl.disabled = current.checked;
+    const onlyCurrent = currentEl.checked;
+
+    downloadEl.disabled = onlyCurrent;
+    historyEl.disabled = onlyCurrent;
+    passwordEl.disabled = onlyCurrent;
 }
 
 function saveOptions() {
     chrome.storage.local.set({
         [OPTIONS_KEY]: {
+            current: currentEl.checked,
             history: historyEl.checked,
             cache: cacheEl.checked,
             cookie: cookieEl.checked,
@@ -64,7 +77,7 @@ function saveOptions() {
     });
 }
 
-current.addEventListener("change", switchCheckbox);
+currentEl.addEventListener("change", switchCheckbox);
 
 clearBtn.addEventListener("click", () => {
     const history = historyEl.checked;
@@ -88,6 +101,8 @@ clearBtn.addEventListener("click", () => {
         const tab = tabs[0];
         const url = tab.url;
         const timeMap = new Map();
+        const onlyCurrent = currentEl.checked;
+        const others = cookie && !onlyCurrent;
 
         timeMap.set("h", 60 * 60 * 1000);
         timeMap.set("d", 24 * 60 * 60 * 1000);
@@ -96,7 +111,7 @@ clearBtn.addEventListener("click", () => {
         timeMap.set("a", 0);
         saveOptions();
 
-        if (!/^https?/.test(url) && current.checked) return;
+        if (!/^https?/.test(url) && onlyCurrent) return;
 
         const a = document.createElement("a");
         a.href = url;
@@ -105,18 +120,18 @@ clearBtn.addEventListener("click", () => {
 
         chrome.browsingData.remove(
             {
-                since: timeMap.get(timeRangeEl.value),
-                origins: current.checked ? [a.origin] : undefined
+                since: timeMap.get(timeRangeEl.value) || 0,
+                origins: onlyCurrent ? [a.origin] : undefined
             } as any,
             {
                 cache,
                 cookies: cookie,
-                downloads: download && !current.checked,
-                formData: cookie,
-                indexedDB: cookie,
-                localStorage: cookie,
-                passwords: password,
-                history: history && !current.checked
+                downloads: download && !onlyCurrent,
+                formData: others,
+                indexedDB: others,
+                localStorage: others,
+                passwords: password && !onlyCurrent,
+                history: history && !onlyCurrent
             },
             () => {
                 clearBtn.innerHTML = "清理";
@@ -124,5 +139,3 @@ clearBtn.addEventListener("click", () => {
             });
     });
 });
-
-switchCheckbox();

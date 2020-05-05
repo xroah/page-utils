@@ -276,7 +276,7 @@ let gesture: any = {
         return this;
     },
     handleKeyEvent(evt: KeyboardEvent) {
-        let key = evt.key.toLowerCase(); //sometimes the evt.key is undefined
+        let key = (evt.key || "").toLowerCase(); //sometimes the evt.key is undefined
 
         if (key === "escape") {
             this.reset();
