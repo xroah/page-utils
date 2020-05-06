@@ -29,6 +29,15 @@ function switchTab(dir: string) {
     });
 }
 
+let cancel: number | null = null;
+
+function cancelScroll() {
+    if (cancel) {
+        cancelAnimationFrame(cancel);
+        cancel = null;
+    }
+}
+
 function scrollTo(pos: number) {
     const scroll = () => {
         const sTop = document.documentElement.scrollTop;
@@ -37,7 +46,7 @@ function scrollTo(pos: number) {
         let _dis = dis;
 
         if (absDis > 0) {
-            requestAnimationFrame(scroll);
+            cancel = requestAnimationFrame(scroll);
 
             if (absDis < 10) {
                 _dis = dis < 0 ? -10 : 10;
@@ -54,6 +63,9 @@ function scrollTo(pos: number) {
     return this;
 }
 
+window.addEventListener("scroll", cancelScroll);
+window.addEventListener("keydown", cancelScroll);
+
 export const page: any = {
     back() {
         history.back()
@@ -63,9 +75,6 @@ export const page: any = {
     },
     refresh() {
         location.reload();
-    },
-    forceRefresh() {
-        location.reload(true);
     },
     scrollUp() {
         scrollTo(document.documentElement.scrollTop - window.innerHeight);
@@ -154,7 +163,19 @@ export const chromeAPI: any = {
     },
     createIncognito() {
         chrome.windows.create({
-            incognito:  true
+            incognito: true
+        });
+    },
+    refreshAllTab() {
+        chrome.tabs.query({}, tabs => {
+            tabs.forEach(
+                t => chrome.tabs.reload(t.id, { bypassCache: true })
+            );
+        });
+    },
+    forceRefresh() {
+        getCurrentTab(t => {
+            chrome.tabs.reload(t.id, { bypassCache: true });
         });
     },
     maximum() {

@@ -150,8 +150,8 @@ function updateView(hash = location.hash) {
         const el = getById("drawGestureWrapper");
         const svg = getById("gestureTrack");
 
-        svg.setAttribute("width", `${el.offsetWidth}`);
-        svg.setAttribute("height", `${el.offsetHeight}`);
+        svg.setAttribute("width", `${el.clientWidth}`);
+        svg.setAttribute("height", `${el.clientHeight}`);
     }
 }
 

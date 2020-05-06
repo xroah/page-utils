@@ -91,6 +91,9 @@ const allGestureFns = Object.values(DIR_TEXT_MAP).concat([{
 }, {
     action: "openSettings",
     text: "打开设置"
+}, {
+    action: "refreshAllTab",
+    text: "刷新所有标签"
 }]);
 
 export {

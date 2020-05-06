@@ -261,6 +261,10 @@ body {
     transform: translateY(-1000px);
     opacity: 0;
 
+    svg {
+        vertical-align: middle;
+    }
+
     &.show {
         transform: translateY(0);
         opacity: 1;
@@ -278,13 +282,13 @@ body {
 
     .draw-gesture-wrapper {
         flex: 1;
-        margin: 10px 0;
         border: 1px dashed #333;
     }
 
     .new-gestures {
         align-items: center;
         height: 40px;
+        flex-shrink: 0;
     }
 }
 

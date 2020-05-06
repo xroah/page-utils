@@ -13,7 +13,6 @@ let gesture: any = {
     wrapper: null,
     positions: [],
     dirs: [],
-    cancelScroll: null,
     showTrack: true,
     trackColor: "",
     trackWidth: 0,
@@ -52,6 +51,8 @@ let gesture: any = {
         const pos: any = this.lastPosition;
 
         if (evt.button !== this.button) return;
+
+        this.preventContextMenu = false;
 
         if (ua.indexOf("linux") > -1) {
             //the context menu triggers after mousedown rather than mouseup on linux
@@ -115,6 +116,7 @@ let gesture: any = {
                 this.updateDirView(dir);
             }
 
+            this.preventContextMenu = true;
             pos.x = x;
             pos.y = y;
         }
@@ -133,7 +135,6 @@ let gesture: any = {
         }
 
         this.mousedown = false;
-        this.preventContextMenu = false;
         this.wrapper = null;
         this.svgTag = null;
         this.polyline = null;

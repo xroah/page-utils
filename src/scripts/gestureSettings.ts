@@ -80,7 +80,10 @@ document.addEventListener("mousemove", evt => {
 });
 
 saveGesture.addEventListener("click", () => {
+    const selected = fnsEl.selectedOptions[0];
     const dirStr = dirs.join("");
+
+    if (!selected || !selected.value) return alert("请选择手势功能！");
 
     if (!dirStr) return alert("请绘制手势");
 
@@ -88,14 +91,11 @@ saveGesture.addEventListener("click", () => {
         const {
             gesture: { actions = {} }
         } = opts;
-        const selected = fnsEl.selectedOptions[0];
         let save = true;
-
-        if (!selected) return alert("请选择手势功能！");
-
         const obj = {
             action: selected.value,
-            text: selected.text
+            text: selected.text,
+            timestamp: Date.now()
         };
 
         if (
@@ -156,9 +156,12 @@ const gestureSettings = {
         let frag = document.createDocumentFragment();
         let con = document.getElementById("gestureList");
         let addCon = document.createElement("div");
-        let gestureFnSel = getById("gestureFunctions");
         let selFrag = document.createDocumentFragment();
         con.innerHTML = "";
+
+        keys.sort(
+            (a, b) => (gestures[a].timestamp || 0) - (gestures[b].timestamp || 0)
+        );
 
         for (let k of keys) {
             let div = document.createElement("div");
@@ -203,6 +206,7 @@ const gestureSettings = {
             frag.appendChild(div);
         }
 
+        selFrag.appendChild(new Option("请选择", ""));
         allGestureFns.forEach(a => {
             let option = new Option(a.text, a.action);
 
@@ -214,7 +218,7 @@ const gestureSettings = {
         addCon.addEventListener("click", gestureSettings.showGestureDialog);
         frag.appendChild(addCon);
         con.appendChild(frag);
-        gestureFnSel.appendChild(selFrag);
+        fnsEl.appendChild(selFrag);
     },
     initGestureDialog(fn: string, initDirs: string) {
         fnsEl.value = fn;
