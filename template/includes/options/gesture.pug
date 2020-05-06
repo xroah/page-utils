@@ -43,12 +43,12 @@ include ../../mixins/checkbox
             div
                 span 手势功能：
                 select#gestureFunctions
-            .mt-10.d-flex.new-gestures
+            .d-flex.new-gestures
                 span 新建手势：
                 #newGestures 
             .draw-gesture-wrapper#drawGestureWrapper
                 svg#gestureTrack(xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink")
                     polyline(stroke="#1998ff" stroke-width="5" stroke-linejoin="round" fill="transparent")
-            .gesture-footer.d-flex.justify-end 
+            .gesture-footer.d-flex.justify-end.mt-10
                 button.btn.btn-primary#saveGesture 确定
                 button.btn.ml-10#cancelAddGesture 取消

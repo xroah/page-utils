@@ -1,6 +1,10 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
+const rmdir = require("./rmdir");
+const createWS = require("./ws");
+const WebSocket = require("ws");
 
 const fs = require("fs");
 const path = require("path");
@@ -46,45 +50,10 @@ function getTemplate() {
     });
 }
 
-function readdir(dir) {
-    if (path.isAbsolute(dir)) {
-        dir = path.resolve(dir);
-    }
-
-    return fs.readdirSync(dir).map(p => `${dir}/${p}`);
-}
-
-function rmDir(dir) {
-    dir = path.resolve(dir);
-
-    if (
-        !fs.existsSync(dir) ||
-        !fs.lstatSync(dir).isDirectory()
-    ) return;
-
-    let dirs = [dir];
-    let files = readdir(dir);
-
-    while (files.length) {
-        let f = files.pop();
-        stat = fs.statSync(f);
-        if (stat.isDirectory()) {
-            files.push(...readdir(f));
-            dirs.push(path.resolve(f));
-        } else {
-            fs.unlinkSync(f);
-        }
-    }
-
-    while (dirs.length) {
-        fs.rmdirSync(dirs.pop());
-    }
-}
-
 let plugins = getTemplate();
 
 let cfg = {
-    mode: "development",
+    mode: process.env.NODE_ENV,
     entry: getEntries(),
     output: {
         path: `${context}/dist`,
@@ -135,12 +104,46 @@ plugins.push(
     })
 );
 
-rmDir("dist");
-
 cfg.plugins = plugins;
 
-module.exports = env => {
-    cfg.mode = env;
+rmdir(cfg.output.path);
 
-    return cfg;
-};
+function handleError(err, stats) {
+    if (err || stats.hasErrors()) {
+        if (err) throw err;
+
+        console.log(stats.compilation.errors.map(e => e.message).join("\n\n"));
+
+        return true;
+    }
+
+    return false;
+}
+
+if (process.env.NODE_ENV === "development") {
+    const compiler = webpack(cfg);
+    let requests = [];
+
+    createWS(ws => requests.push(ws));
+
+    compiler.hooks.done.tap("done", stats => {
+        if (stats.hasErrors()) return;
+
+        requests.forEach((req, i) => {
+            if (req.readyState === req.CLOSED) {
+                return requests.splice(i, 1);
+            }
+
+            req.send(JSON.stringify({
+                status: 0,
+                message: "reload"
+            }));
+        });
+
+        console.log("updated");
+    });
+
+    compiler.watch({}, handleError);
+} else {
+    webpack(cfg, handleError);
+}
