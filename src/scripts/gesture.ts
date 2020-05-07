@@ -1,5 +1,5 @@
 import { DIR_MAP } from "./variables/constants";
-import { page } from "./gestureFunctions";
+import { page, cancelScroll } from "./gestureFunctions";
 import "../styles/gesture.scss";
 
 let gesture: any = {
@@ -296,6 +296,8 @@ let gesture: any = {
         this.initSettings();
 
         chrome.storage.onChanged.addListener(this.handleStorageChange.bind(this));
+        window.addEventListener("wheel", cancelScroll);
+        window.addEventListener("keydown", cancelScroll)
     }
 };
 

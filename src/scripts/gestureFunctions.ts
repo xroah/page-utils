@@ -31,7 +31,7 @@ function switchTab(dir: string) {
 
 let cancel: number | null = null;
 
-function cancelScroll() {
+export function cancelScroll() {
     if (cancel) {
         cancelAnimationFrame(cancel);
         cancel = null;
@@ -39,12 +39,19 @@ function cancelScroll() {
 }
 
 function scrollTo(pos: number) {
+    const max = document.body.scrollHeight - window.innerHeight;
+    if (pos < 0) {
+        pos = 0;
+    } else if(pos > max) {
+        pos = max;
+    }
+
     const scroll = () => {
         const sTop = document.documentElement.scrollTop;
         const dis = Math.floor((pos - sTop) / 10);
         const absDis = Math.abs(dis);
         let _dis = dis;
-
+        
         if (absDis > 0) {
             cancel = requestAnimationFrame(scroll);
 
@@ -58,13 +65,11 @@ function scrollTo(pos: number) {
         }
     };
 
+    cancelScroll();
     scroll();
 
     return this;
 }
-
-window.addEventListener("scroll", cancelScroll);
-window.addEventListener("keydown", cancelScroll);
 
 export const page: any = {
     back() {
@@ -191,6 +196,14 @@ export const chromeAPI: any = {
     fullscreen() {
         chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
             state: "fullscreen"
+        });
+    },
+    createBookmark() {
+        getCurrentTab(tab => {
+            chrome.bookmarks.create({
+                url: tab.url,
+                title: tab.title
+            });
         });
     }
 };

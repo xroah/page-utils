@@ -94,6 +94,9 @@ const allGestureFns = Object.values(DIR_TEXT_MAP).concat([{
 }, {
     action: "refreshAllTab",
     text: "刷新所有标签"
+}, {
+    action: "createBookmark",
+    text: "添加书签"
 }]);
 
 export {
