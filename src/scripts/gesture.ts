@@ -1,5 +1,5 @@
 import { DIR_MAP } from "./variables/constants";
-import { page, cancelScroll } from "./gestureFunctions";
+import DOMAPI, { cancelScroll } from "./gestureDOMAPI";
 import "../styles/gesture.scss";
 
 let gesture: any = {
@@ -209,8 +209,8 @@ let gesture: any = {
 
         if (!gesture) return this;
 
-        if (gesture.action in page) {
-            (page[gesture.action])();
+        if (gesture.action in DOMAPI) {
+            (DOMAPI as any)[gesture.action]();
         } else {
             //others need invoke chrome api
             chrome.runtime.sendMessage({ type: "executeGesture", message: gesture.action });

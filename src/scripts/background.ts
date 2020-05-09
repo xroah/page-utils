@@ -1,6 +1,6 @@
 import defaultOptions from "./variables/defaultOptions";
 import { EventProps } from "./interface/index";
-import { chromeAPI } from "./gestureFunctions";
+import chromeAPI from "./gestureChromeAPI";
 
 function handleReset(type: "normal" | "gesture") {
     chrome.storage.local.get("options", (obj: any) => {
@@ -15,7 +15,7 @@ function handleReset(type: "normal" | "gesture") {
 
 function executeGesture(message: string) {
     if (message in chromeAPI) {
-        chromeAPI[message]();
+        (chromeAPI as any)[message]();
     }
 }
 
@@ -41,15 +41,16 @@ chrome.runtime.onInstalled.addListener((detail: chrome.runtime.InstalledDetails)
 
 //reload the extension
 if (process.env.NODE_ENV === "development") {
-    const ws = new WebSocket("ws://localhost:8000");
+    (function () {
+        let ws;
 
-    ws.onerror = () => console.log("error");
-    ws.onmessage = evt => {
-        const data = JSON.parse(evt.data);
-
-        if (data.status === 0 && data.message === "reload") {
-            chrome.runtime.reload();
-            console.log("Extension has reloaded successfully!");
+        try {
+            ws = new WebSocket("ws://localhost:8000");
+        } catch (error) {
+            return;
         }
-    };
+
+        ws.onerror = () => console.log("error");
+        ws.onmessage = () => chrome.runtime.reload();
+    })();
 }
