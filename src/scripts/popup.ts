@@ -19,6 +19,19 @@ function switchCheckbox() {
     downloadEl.disabled = onlyCurrent;
     historyEl.disabled = onlyCurrent;
     passwordEl.disabled = onlyCurrent;
+
+    if (onlyCurrent) {
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        }, tabs => {
+            const tab = tabs[0];
+
+            clearBtn.disabled = !/^https?/.test(tab.url);
+        });
+    } else {
+        clearBtn.disabled = false;
+    }
 }
 
 function initClearOptions() {
@@ -107,7 +120,9 @@ function clear() {
         const others = cookie && !onlyCurrent;
         const mask = getById("cleaning");
         const stat = mask.firstElementChild;
+        const a = document.createElement("a");
 
+        stat.classList.remove("complete");
         timeMap.set("h", 60 * 60 * 1000);
         timeMap.set("d", 24 * 60 * 60 * 1000);
         timeMap.set("w", 7 * 24 * 60 * 60 * 1000);
@@ -115,14 +130,8 @@ function clear() {
         timeMap.set("a", 0);
         saveOptions();
 
-        if (!/^https?/.test(url) && onlyCurrent) return;
-
-        const a = document.createElement("a");
         a.href = url;
         clearBtn.disabled = true;
-
-        stat.classList.remove("complete");
-
         mask.style.display = "flex";
         
         chrome.browsingData.remove(
