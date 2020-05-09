@@ -7,6 +7,10 @@ html
         include ./mixins/checkbox
 
         .main-container.popup-container
+            .cleaning#cleaning
+                .spinner
+            div.d-flex.justify-end
+                a.settings#settings(href="#" title="设置")
             .row
                 h3.heading 页面二维码
             .row
@@ -23,9 +27,8 @@ html
                     option(value="w") 1周内
                     option(value="m") 4周内
                     option(value="a") 所有
-            .row 
-                +checkbox("onlyCurrent", "只清理当前站点(chrome74+)")
-                hr
+            .row.only-current
+                +checkbox("onlyCurrent", "只清理当前站点")
             .row 
                 +checkbox("history", "历史记录")
             .row 
