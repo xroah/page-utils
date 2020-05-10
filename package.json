@@ -4,8 +4,8 @@
   "description": "An chrome extension for web pages",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=development node webpack",
-    "build": "cross-env NODE_ENV=production  node webpack"
+    "start": "cross-env NODE_ENV=development node build",
+    "build": "cross-env NODE_ENV=production  node build"
   },
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
     "pug": "^2.0.4",
     "pug-loader": "^2.4.0",
     "sass-loader": "^8.0.2",
-    "ts-loader": "^7.0.2",
+    "ts-loader": "^7.0.3",
     "typescript": "^3.8.3",
     "url-loader": "^4.1.0",
     "webpack": "^4.43.0",
