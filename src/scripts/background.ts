@@ -1,6 +1,6 @@
 import defaultOptions from "./variables/defaultOptions";
 import { EventProps } from "./interface/index";
-import chromeAPI from "./gestureChromeAPI";
+import chromeAPI from "./common/gestureChromeAPI";
 
 function handleReset(type: "normal" | "gesture") {
     chrome.storage.local.get("options", (obj: any) => {

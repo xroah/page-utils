@@ -9,7 +9,7 @@ function request(url: string, responseType: XMLHttpRequestResponseType = "json")
         xhr.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 resolve(xhr.response);
-            } 
+            }
 
         };
         xhr.onerror = function () {
@@ -25,6 +25,7 @@ function request(url: string, responseType: XMLHttpRequestResponseType = "json")
 
 function getToday() {
     let date = new Date();
+
     return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 }
 
@@ -32,18 +33,19 @@ function search() {
     let input = document.getElementById("keywords") as HTMLInputElement;
     let se = document.getElementById("searchEngine") as HTMLSelectElement;
     let value = input.value;
+
     if (!value.trim()) {
         input.focus();
+
         return;
     }
-    
+
     location.assign(`${se.value}${input.value}`);
 }
 
 function fetchImg() {
-    let time = Date.now();
-    //防止缓存
-    let url = `https://cn.bing.com/HPImageArchive.aspx?format=js&n=1&__time=${time}`;
+    let url = `https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&nc=${Date.now()}&pid=hp`;
+
     request(url)
         .then((res: any) => {
             let img = res.images[0];
@@ -81,9 +83,10 @@ function initEvent() {
     });
 }
 
-function init() {
+(function () {
     chrome.storage.local.get("backgroundImg", function (item) {
         let bg = item.backgroundImg;
+
         if (bg && bg.date === getToday()) {
             setBg(bg)
         } else {
@@ -92,6 +95,4 @@ function init() {
     });
 
     initEvent();
-}
-
-init();
+})();

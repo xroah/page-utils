@@ -3,8 +3,8 @@ import {
     getById,
     getOptions,
     setOptions
-} from "./utils";
-import gestureSettings from "./gestureSettings";
+} from "./common/utils";
+import gestureSettings from "./common/gestureSettings";
 import "../styles/options.scss";
 
 function showMenu(evt: MouseEvent | { currentTarget: HTMLElement }) {

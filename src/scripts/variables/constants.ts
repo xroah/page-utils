@@ -79,7 +79,7 @@ const allGestureFns = Object.values(DIR_TEXT_MAP).concat([{
 }, {
     action: "maximum",
     text: "窗口最大化"
-}, {
+}, { 
     action: "minimum",
     text: "窗口最小化"
 }, {

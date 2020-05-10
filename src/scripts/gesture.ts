@@ -1,5 +1,5 @@
 import { DIR_MAP } from "./variables/constants";
-import DOMAPI, { cancelScroll } from "./gestureDOMAPI";
+import DOMAPI, { cancelScroll } from "./common/gestureDOMAPI";
 import "../styles/gesture.scss";
 
 let gesture: any = {
