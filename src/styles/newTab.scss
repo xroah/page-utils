@@ -1,4 +1,5 @@
 @import "./common";
+
 .background {
     position: fixed;
     top: 0;
@@ -9,9 +10,6 @@
     background-size: cover;
     z-index: -1;
 }
-.scale-invisible {
-    transform: scale(0);
-}
 
 .main-container {
     display: flex;
@@ -19,19 +17,43 @@
     align-items: center;
 }
 
-.daily-sentence {
-    margin-top: 50px;
-    width: 538px;
-    padding: 5px;
-    font-size: 20px;
-    text-shadow: 0 0 5px rgba(24, 144, 255, .5);
+.date-time-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
     color: #333;
-    transition: all .3s;
+
+    :first-child {
+        font-size: 50px;
+        font-weight: bold;
+    }
+
+    :last-child {
+        font-size: 25px;
+    }
+}
+
+.daily-sentence {
+    position: fixed;
+    left: 0;
+    bottom: 10px;
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, .5),
+        2px 2px 2px rgba(0, 0, 0, .4),
+        3px 3px 3px rgba(0, 0, 0, .3),
+        4px 4px 4px rgba(0, 0, 0, .2),
+        5px 5px 5px rgba(0, 0, 0, .1);
+    font-size: 20px;
+    color: #fff;
 }
 
 .search-wrapper {
     display: flex;
     margin-top: 10px;
+
     .keywords {
         width: 380px;
         height: 36px;
@@ -40,15 +62,18 @@
         border: 1px solid #1890ff;
         background-color: rgba(255, 255, 255, .5);
         transition: all .3s;
+
         &:focus {
             box-shadow: 0 0 5px 0 rgba(24, 144, 255, .8);
         }
     }
+
     .search-engine {
         width: 80px;
         padding: 0 10px;
         border: 1px solid #1890ff;
     }
+
     .search {
         width: 80px;
         height: 36px;
@@ -57,9 +82,11 @@
         background: #1890ff url(../images/search.svg) no-repeat center center/20px 20px;
         cursor: pointer;
         transition: all .3s;
+
         &:hover {
             background-color: #40a9ff;
         }
+
         &:active {
             background-color: #096dd9;
         }
@@ -85,6 +112,7 @@
     margin: 15px 0;
     padding: 10px;
     background-color: rgba(255, 255, 255, .6);
+
     a {
         margin: 5px 0;
         overflow: hidden;
@@ -93,9 +121,78 @@
         color: #333;
         transition: all .3s;
         transform-origin: left;
+
         &:hover {
             color: #1890ff;
             transform: scale(1.05);
+        }
+    }
+}
+
+.quick-link-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: fixed;
+    right: 30px;
+    top: 30px;
+
+    .toggle-quick-link {
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: url(../images/link.svg) no-repeat center center / 28px 28px transparent;
+        cursor: pointer;
+
+        &:hover {
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, .1);            
+        }
+    }
+
+    .quick-list {
+        display: none;
+        padding: 5px 0;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, .8);
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all .3s;
+
+        &.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .quick-link-item {
+        width: 100%;
+        padding: 0 15px 0 42px;
+        line-height: 2;
+        border: none;
+        font-size: 16px;
+        text-align: left;
+        color: #666;
+        background: url(../images/apps.svg) no-repeat 15px center / 20px 20px transparent;
+        transition: all .3s;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    $bgs: apps,
+    bookmark,
+    history,
+    download,
+    google-chrome,
+    settings;
+
+    @each $bg in $bgs {
+        .#{$bg}-link {
+            background-image: url(../images/#{$bg}.svg);
         }
     }
 }

@@ -5,7 +5,6 @@ function request(url: string, responseType: XMLHttpRequestResponseType = "json")
         let xhr = new XMLHttpRequest();
 
         xhr.responseType = responseType;
-
         xhr.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 resolve(xhr.response);
@@ -18,7 +17,6 @@ function request(url: string, responseType: XMLHttpRequestResponseType = "json")
         };
 
         xhr.open("GET", url, true);
-
         xhr.send();
     })
 }
@@ -26,7 +24,7 @@ function request(url: string, responseType: XMLHttpRequestResponseType = "json")
 function getToday() {
     let date = new Date();
 
-    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
 function search() {
@@ -71,9 +69,89 @@ function setBg(bgImg: any) {
     copyright.title = bgImg.info;
 }
 
+function fetchSentence() {
+    request("http://open.iciba.com/dsapi/")
+        .then((res: any) => {
+            const dailySentence = {
+                date: getToday(),
+                content: res.content,
+                note: res.note
+            }
+
+            chrome.storage.local.set({
+                dailySentence
+            });
+
+            setSentence(dailySentence);
+        });
+}
+
+function setSentence(sentence: any) {
+    const el = document.getElementById("sentence");
+
+    el.innerHTML = sentence.content;
+    el.title = sentence.note;
+}
+
+function emulateTransitionEnd(el: HTMLElement, fn: () => void) {
+    let called = false;
+    const callback = () => {
+        if (called) return;
+
+        called = true;
+
+        fn();
+        cancel();
+    };
+    const cancel = () => {
+        if (timer != undefined) {
+            clearTimeout(timer);
+        }
+
+        el.removeEventListener("transitionend", callback);
+    };
+    const timer = setTimeout(callback, 300);
+
+    el.addEventListener("transitionend", callback);
+
+    return cancel;
+}
+
+function showLinkLayer() {
+    const list = document.getElementById("quickList");
+
+    if (list.classList.contains("show")) return;
+
+    list.style.display = "block";
+    list.offsetHeight;
+    list.classList.add("show");
+}
+
+function hideLinkLayer() {
+    const list = document.getElementById("quickList");
+
+    if (!list.classList.contains("show")) return;
+
+    list.classList.remove("show");
+    emulateTransitionEnd(list, () => {
+        list.style.display = "none";
+    });
+}
+
+function toggleLinkLayer() {
+    const list = document.getElementById("quickList");
+
+    if (list.classList.contains("show")) {
+        hideLinkLayer();
+    } else {
+        showLinkLayer();
+    }
+}
+
 function initEvent() {
-    let searchBtn = document.getElementById("search");
-    let input = document.getElementById("keywords");
+    const searchBtn = document.getElementById("search");
+    const input = document.getElementById("keywords");
+    const toggle = document.getElementById("toggleLink");
 
     searchBtn.addEventListener("click", search);
     input.addEventListener("keydown", evt => {
@@ -81,10 +159,61 @@ function initEvent() {
             search();
         }
     });
+    toggle.addEventListener("click", toggleLinkLayer);
+    document.addEventListener("click", evt => {
+        const target = evt.target as HTMLElement;
+        const list = document.getElementById("quickList");
+
+        if (
+            target !== toggle &&
+            target !== list &&
+            !list.contains(target)
+        ) {
+            return hideLinkLayer();
+        }
+
+        if (target.classList.contains("quick-link-item")) {
+            chrome.tabs.query({
+                active: true,
+                currentWindow: true
+            }, tabs => {
+                const tab = tabs[0];
+
+                chrome.tabs.update(tab.id, {
+                    url: target.dataset.href
+                });
+            });
+        }
+    });
+}
+
+function initDate() {
+    const date = new Date();
+    const weeks = ["日", "一", "二", "三", "四", "五", "六"];
+    const weekDay = `星期${weeks[date.getDay()]}`;
+    const el = document.getElementById("date");
+
+    el.innerHTML = `${date.getMonth() + 1}月${date.getDate()}日 ${weekDay}`;
+}
+
+function initTime() {
+    const el = document.getElementById("time");
+    const loop = () => {
+        const date = new Date();
+        const convertNum = (num: number) => (num + 100).toString().substring(1);
+        const h = convertNum(date.getHours());
+        const m = convertNum(date.getMinutes());
+        const s = convertNum(date.getSeconds());
+        el.innerHTML = `${h}:${m}:${s}`;;
+
+        setTimeout(loop, 1000);
+    };
+
+    loop();
 }
 
 (function () {
-    chrome.storage.local.get("backgroundImg", function (item) {
+    chrome.storage.local.get("backgroundImg", item => {
         let bg = item.backgroundImg;
 
         if (bg && bg.date === getToday()) {
@@ -94,5 +223,17 @@ function initEvent() {
         }
     });
 
+    chrome.storage.local.get("dailySentence", item => {
+        let sentence = item.dailySentence;
+
+        if (sentence && sentence.date === getToday()) {
+            setSentence(sentence);
+        } else {
+            fetchSentence();
+        }
+    });
+
     initEvent();
+    initDate();
+    initTime();
 })();

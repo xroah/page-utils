@@ -5,8 +5,42 @@ html
         title 新标签页
     body
         #bg.background
+        .quick-link-wrapper
+            button.toggle-quick-link.transition#toggleLink
+            ul.quick-list#quickList
+                -
+                    var links = [{
+                        class: "quick-link-item apps-link",
+                        text: "Apps",
+                        href: "chrome://apps"
+                    }, {
+                        class: "quick-link-item bookmark-link",
+                        text: "书签",
+                        href: "chrome://bookmarks"
+                    }, {
+                        class: "quick-link-item history-link",
+                        text: "历史记录",
+                        href: "chrome://history"
+                    }, {
+                        class: "quick-link-item download-link",
+                        text: "下载记录",
+                        href: "chrome://downloads"
+                    }, {
+                        class: "quick-link-item google-chrome-link",
+                        text: "扩展",
+                        href: "chrome://extensions"
+                    }, {
+                        class: "quick-link-item settings-link",
+                        text: "浏览器设置",
+                        href: "chrome://settings"
+                    }]
+                each val in links
+                    li
+                        button(data-href=val.href class=val.class) #{val.text}
         section.main-container
-            p#sentence.daily-sentence.scale-invisible
+            .date-time-info
+                span#time  15:35:26
+                span#date 5月10日 星期日
             .search-wrapper
                 - 
                     var engines = [ 
@@ -32,4 +66,7 @@ html
                         option(value=val.url) #{val.name}
                 input#keywords.keywords(type="text")
                 button#search.search(type="button")
-            span#copyright.copyright
+        .top-sites#topSites
+
+        span#copyright.copyright
+        p#sentence.daily-sentence.scale-invisible
