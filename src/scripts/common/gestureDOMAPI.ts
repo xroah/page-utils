@@ -16,19 +16,20 @@ function scrollTo(pos: number) {
     }
 
     const scroll = () => {
+        const THRESHOLD = 10;
         const sTop = document.documentElement.scrollTop;
-        const dis = Math.floor((pos - sTop) / 10);
-        const absDis = Math.abs(dis);
-        let _dis = dis;
+        const sLeft = document.documentElement.scrollLeft;
+        const dis = pos - sTop;
+        let speed = Math.floor((pos - sTop) / 10);
         
-        if (absDis > 0) {
+        if (Math.abs(speed) > 0) {
             cancel = requestAnimationFrame(scroll);
 
-            if (absDis < 10) {
-                _dis = dis < 0 ? -10 : 10;
+            if (Math.abs(dis) < THRESHOLD * 10) {
+                speed = dis < 0 ? -10 : 10;
             }
 
-            window.scrollTo(0, sTop + _dis);
+            window.scrollTo(0, sTop + speed);
         } else {
             window.scrollTo(0, pos);
         }
