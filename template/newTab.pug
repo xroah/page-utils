@@ -6,7 +6,7 @@ html
     body
         #bg.background
         .quick-link-wrapper
-            button.toggle-quick-link.transition#toggleLink
+            button.toggle-quick-link.transition#toggleLink(title="快捷链接")
             ul.quick-list#quickList
                 -
                     var links = [{
@@ -38,9 +38,9 @@ html
                     li
                         button(data-href=val.href class=val.class) #{val.text}
         section.main-container
-            .date-time-info
-                span#time  15:35:26
-                span#date 5月10日 星期日
+            .date-time-info.text-shadow
+                span#time  
+                span#date 
             .search-wrapper
                 - 
                     var engines = [ 
@@ -69,4 +69,4 @@ html
         .top-sites#topSites
 
         span#copyright.copyright
-        p#sentence.daily-sentence.scale-invisible
+        p#sentence.daily-sentence.scale-invisible.text-shadow
