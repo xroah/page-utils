@@ -29,9 +29,9 @@ function scrollTo(pos: number) {
                 speed = dis < 0 ? -10 : 10;
             }
 
-            window.scrollTo(0, sTop + speed);
+            window.scrollTo(sLeft, sTop + speed);
         } else {
-            window.scrollTo(0, pos);
+            window.scrollTo(sLeft, pos);
         }
     };
 
@@ -52,10 +52,10 @@ export default {
         location.reload();
     },
     scrollUp() {
-        scrollTo(document.documentElement.scrollTop - window.innerHeight);
+        scrollTo(document.documentElement.scrollTop - window.innerHeight + 50);
     },
     scrollDown() {
-        scrollTo(document.documentElement.scrollTop + window.innerHeight)
+        scrollTo(document.documentElement.scrollTop + window.innerHeight - 50)
     },
     scrollTop() {
         scrollTo(0);
