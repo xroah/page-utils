@@ -2,8 +2,8 @@ import {
     getById,
     getOptions,
     setOptions
-} from "./utils";
-import { DIR_MAP, allGestureFns } from "../variables/constants";
+} from "../utils";
+import { DIR_MAP, allGestureFns } from "../../variables/constants";
 
 const saveGesture = getById("saveGesture");
 const gestureEl = getById("drawGestureWrapper");

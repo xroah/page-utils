@@ -1,5 +1,5 @@
 import { toDataURL } from "qrcode";
-import { getById } from "./common/utils";
+import { getById } from "./modules/utils";
 import "../styles/popup.scss";
 
 const qrCodeBtn = getById("showPageQRCode") as HTMLButtonElement;
