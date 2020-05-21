@@ -14,3 +14,27 @@ export function setOptions(options: any, callback?: () => void) {
 export function getById(id: string) {
     return document.getElementById(id);
 }
+
+export function emulateTransitionEnd(el: HTMLElement, fn: () => void) {
+    let called = false;
+    const callback = () => {
+        if (called) return;
+
+        called = true;
+
+        fn();
+        cancel();
+    };
+    const cancel = () => {
+        if (timer != undefined) {
+            clearTimeout(timer);
+        }
+
+        el.removeEventListener("transitionend", callback);
+    };
+    const timer = setTimeout(callback, 300);
+
+    el.addEventListener("transitionend", callback);
+
+    return cancel;
+}
