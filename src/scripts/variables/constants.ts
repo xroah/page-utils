@@ -67,6 +67,12 @@ const DIR_TEXT_MAP = {
     }
 };
 
+let timestamp = Date.now();
+
+Object.keys(DIR_TEXT_MAP).forEach(
+    key => (DIR_TEXT_MAP as any)[key].timestamp = timestamp + 1
+);
+
 const allGestureFns = Object.values(DIR_TEXT_MAP).concat([{
     action: "closeLeft",
     text: "关闭左侧标签"
@@ -79,7 +85,7 @@ const allGestureFns = Object.values(DIR_TEXT_MAP).concat([{
 }, {
     action: "maximum",
     text: "窗口最大化"
-}, { 
+}, {
     action: "minimum",
     text: "窗口最小化"
 }, {

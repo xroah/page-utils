@@ -1,5 +1,5 @@
 import "../styles/newTab.scss";
-import { emulateTransitionEnd } from "./common/utils";
+import { emulateTransitionEnd } from "./modules/utils";
 
 function request(url: string, responseType: XMLHttpRequestResponseType = "json") {
     return new Promise((resolve: Function, reject: Function) => {

@@ -92,10 +92,11 @@ saveGesture.addEventListener("click", () => {
             gesture: { actions = {} }
         } = opts;
         let save = true;
+        const orig = actions[dirStr] || {};
         const obj = {
             action: selected.value,
             text: selected.text,
-            timestamp: Date.now()
+            timestamp: orig.timestamp || Date.now()
         };
 
         if (
