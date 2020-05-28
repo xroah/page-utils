@@ -1,4 +1,5 @@
 import "../styles/newTab.scss";
+import { emulateTransitionEnd } from "./common/utils";
 
 function request(url: string, responseType: XMLHttpRequestResponseType = "json") {
     return new Promise((resolve: Function, reject: Function) => {
@@ -93,29 +94,6 @@ function setSentence(sentence: any) {
     el.title = sentence.note;
 }
 
-function emulateTransitionEnd(el: HTMLElement, fn: () => void) {
-    let called = false;
-    const callback = () => {
-        if (called) return;
-
-        called = true;
-
-        fn();
-        cancel();
-    };
-    const cancel = () => {
-        if (timer != undefined) {
-            clearTimeout(timer);
-        }
-
-        el.removeEventListener("transitionend", callback);
-    };
-    const timer = setTimeout(callback, 300);
-
-    el.addEventListener("transitionend", callback);
-
-    return cancel;
-}
 
 function showLinkLayer() {
     const list = document.getElementById("quickList");
