@@ -41,16 +41,8 @@ chrome.runtime.onInstalled.addListener((detail: chrome.runtime.InstalledDetails)
 
 //reload the extension
 if (process.env.NODE_ENV === "development") {
-    (function () {
-        let ws;
+    let ws = new WebSocket("ws://localhost:8000");
 
-        try {
-            ws = new WebSocket("ws://localhost:8000");
-        } catch (error) {
-            return;
-        }
-
-        ws.onerror = () => console.log("error");
-        ws.onmessage = () => chrome.runtime.reload();
-    })();
+    ws.onerror = () => console.log("error");
+    ws.onmessage = () => chrome.runtime.reload();
 }

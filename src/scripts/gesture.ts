@@ -64,10 +64,7 @@ let gesture: any = {
             this.linuxInterval = time;
         }
 
-        if (this.wrapper) {
-            document.body.removeChild(this.wrapper);
-            this.wrapper = null;
-        }
+        this.removeChild();
 
         this.mousedown = true;
         pos.x = evt.clientX;
@@ -129,13 +126,20 @@ let gesture: any = {
             .reset()
             .clearCancelTimer();
     },
-    reset() {
-        if (this.wrapper) {
+    removeChild() {
+        if (
+            this.wrapper && 
+            this.wrapper.parentNode === document.body
+        ) {
             document.body.removeChild(this.wrapper);
+
+            this.wrapper = null;
         }
+    },
+    reset() {
+        this.removeChild();
 
         this.mousedown = false;
-        this.wrapper = null;
         this.svgTag = null;
         this.polyline = null;
         this.positions = [];
