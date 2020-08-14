@@ -9,6 +9,11 @@ export function cancelScroll() {
 
 function scrollTo(pos: number) {
     const max = document.body.scrollHeight - window.innerHeight;
+
+    if (max < 0) {
+        return
+    }
+
     if (pos < 0) {
         pos = 0;
     } else if(pos > max) {
