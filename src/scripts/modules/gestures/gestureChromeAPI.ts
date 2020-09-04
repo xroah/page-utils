@@ -1,42 +1,50 @@
 function switchTab(dir: string) {
-    chrome.tabs.query({
-        windowId: chrome.windows.WINDOW_ID_CURRENT
-    }, tabs => {
-        let len = tabs.length;
-        let index = 0;
+    chrome.tabs.query(
+        {
+            windowId: chrome.windows.WINDOW_ID_CURRENT
+        },
+        tabs => {
+            let len = tabs.length;
+            let index = 0;
 
-        if (len === 1) return;
+            if (len === 1) return;
 
-        index = tabs.findIndex(tab => tab.active);
+            index = tabs.findIndex(tab => tab.active);
 
-        if (dir === "left") {
-            if (index === 0) {
-                index = len - 1;
+            if (dir === "left") {
+                if (index === 0) {
+                    index = len - 1;
+                } else {
+                    index -= 1;
+                }
             } else {
-                index -= 1;
+                if (index === len - 1) {
+                    index = 0;
+                } else {
+                    index += 1;
+                }
             }
-        } else {
-            if (index === len - 1) {
-                index = 0;
-            } else {
-                index += 1;
-            }
+
+            chrome.tabs.update(tabs[index].id, {
+                active: true
+            });
         }
-
-        chrome.tabs.update(tabs[index].id, {
-            active: true
-        });
-    });
+    );
 }
 
-function getCurrentTab(callback: (tab: chrome.tabs.Tab) => void) {
+function getCurrentTab(
+    callback: (tab: chrome.tabs.Tab) => void
+) {
     chrome.tabs.query({
         active: true,
         currentWindow: true
     }, tabs => callback(tabs[0]));
 }
 
-function getInactiveTabs(type: "all" | "left" | "right", callback: (tabs: chrome.tabs.Tab[]) => void) {
+function getInactiveTabs(
+    type: "all" | "left" | "right",
+    callback: (tabs: chrome.tabs.Tab[]) => void
+) {
     chrome.tabs.query({
         active: false,
         currentWindow: true
@@ -108,29 +116,38 @@ export default {
     refreshAllTab() {
         chrome.tabs.query({}, tabs => {
             tabs.forEach(
-                t => chrome.tabs.reload(t.id, { bypassCache: true })
+                t => chrome.tabs.reload(t.id, {bypassCache: true})
             );
         });
     },
     forceRefresh() {
         getCurrentTab(t => {
-            chrome.tabs.reload(t.id, { bypassCache: true });
+            chrome.tabs.reload(t.id, {bypassCache: true});
         });
     },
     maximum() {
-        chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-            state: "maximized"
-        });
+        chrome.windows.update(
+            chrome.windows.WINDOW_ID_CURRENT,
+            {
+                state: "maximized"
+            }
+        );
     },
     minimum() {
-        chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-            state: "minimized"
-        });
+        chrome.windows.update(
+            chrome.windows.WINDOW_ID_CURRENT,
+            {
+                state: "minimized"
+            }
+        );
     },
     fullscreen() {
-        chrome.windows.update(chrome.windows.WINDOW_ID_CURRENT, {
-            state: "fullscreen"
-        });
+        chrome.windows.update(
+            chrome.windows.WINDOW_ID_CURRENT,
+            {
+                state: "fullscreen"
+            }
+        );
     },
     createBookmark() {
         getCurrentTab(tab => {

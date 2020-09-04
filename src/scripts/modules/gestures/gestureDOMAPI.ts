@@ -1,5 +1,8 @@
 let cancel: number | null = null;
 
+const body = document.body;
+const html = document.documentElement
+
 export function cancelScroll() {
     if (cancel) {
         cancelAnimationFrame(cancel);
@@ -8,7 +11,7 @@ export function cancelScroll() {
 }
 
 function scrollTo(pos: number) {
-    const max = document.body.scrollHeight - window.innerHeight;
+    const max = body.scrollHeight - window.innerHeight;
 
     if (max < 0) {
         return
@@ -22,8 +25,8 @@ function scrollTo(pos: number) {
 
     const scroll = () => {
         const THRESHOLD = 10;
-        const sTop = document.documentElement.scrollTop;
-        const sLeft = document.documentElement.scrollLeft;
+        const sTop = html.scrollTop;
+        const sLeft = html.scrollLeft;
         const dis = pos - sTop;
         let speed = Math.floor((pos - sTop) / 10);
         
@@ -57,15 +60,15 @@ export default {
         location.reload();
     },
     scrollUp() {
-        scrollTo(document.documentElement.scrollTop - window.innerHeight + 50);
+        scrollTo(html.scrollTop - window.innerHeight + 50);
     },
     scrollDown() {
-        scrollTo(document.documentElement.scrollTop + window.innerHeight - 50)
+        scrollTo(html.scrollTop + window.innerHeight - 50)
     },
     scrollTop() {
         scrollTo(0);
     },
     scrollBottom() {
-        scrollTo(document.body.scrollHeight - window.innerHeight);
+        scrollTo(body.scrollHeight - window.innerHeight);
     }
 };

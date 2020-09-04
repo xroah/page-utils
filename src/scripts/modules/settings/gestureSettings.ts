@@ -3,7 +3,7 @@ import {
     getOptions,
     setOptions
 } from "../utils";
-import { DIR_MAP, allGestureFns } from "../../variables/constants";
+import {DIR_MAP, allGestureFns} from "../../variables/constants";
 
 const saveGesture = getById("saveGesture");
 const gestureEl = getById("drawGestureWrapper");
@@ -29,125 +29,146 @@ let start = {
 let points: string[] = [];
 let dirs: string[] = [];
 
-gestureEl.addEventListener("mousedown", evt => {
-    start.x = evt.clientX;
-    start.y = evt.clientY;
-    mousedown = true;
-    points = [];
-    dirs = [];
+gestureEl.addEventListener(
+    "mousedown",
+    evt => {
+        start.x = evt.clientX;
+        start.y = evt.clientY;
+        mousedown = true;
+        points = [];
+        dirs = [];
 
-    getById("newGestures").innerHTML = "";
+        getById("newGestures").innerHTML = "";
 
-    polyline.setAttribute("points", "");
-});
+        polyline.setAttribute("points", "");
+    }
+);
 gestureEl.addEventListener("contextmenu", evt => evt.preventDefault());
-document.addEventListener("mouseup", evt => {
-    if (!mousedown) return;
+document.addEventListener(
+    "mouseup",
+    () => {
+        if (!mousedown) return;
 
-    mousedown = false;
-});
-document.addEventListener("mousemove", evt => {
-    if (!mousedown) return;
-
-    const x = evt.clientX;
-    const y = evt.clientY;
-    const disX = x - start.x;
-    const disY = y - start.y;
-    const rect = svg.getBoundingClientRect();
-    const dis = Math.sqrt(Math.pow(disX, 2) + Math.pow(disY, 2));
-    let dir = "";
-
-    if (dis >= 10) {
-        const len = dirs.length;
-
-        if (Math.abs(disX) > Math.abs(disY)) {
-            dir = x > start.x ? "r" : "l";
-        } else {
-            dir = y > start.y ? "d" : "u"
-        }
-
-        if (len < 5 && dir !== dirs[len - 1]) {
-            dirs.push(dir);
-            updateGesture(dir);
-        }
-
-        start.x = x;
-        start.y = y;
+        mousedown = false;
     }
+);
+document.addEventListener(
+    "mousemove",
+    evt => {
+        if (!mousedown) return;
 
-    points.push(`${x - rect.left} ${y - rect.top}`);
-    polyline.setAttribute("points", points.join(","));
-});
+        const x = evt.clientX;
+        const y = evt.clientY;
+        const disX = x - start.x;
+        const disY = y - start.y;
+        const rect = svg.getBoundingClientRect();
+        const dis = Math.sqrt(Math.pow(disX, 2) + Math.pow(disY, 2));
+        let dir = "";
 
-saveGesture.addEventListener("click", () => {
-    const selected = fnsEl.selectedOptions[0];
-    const dirStr = dirs.join("");
+        if (dis >= 10) {
+            const len = dirs.length;
 
-    if (!selected || !selected.value) return alert("请选择手势功能！");
-
-    if (!dirStr) return alert("请绘制手势");
-
-    getOptions().then((opts: any) => {
-        const {
-            gesture: { actions = {} }
-        } = opts;
-        let save = true;
-        const orig = actions[dirStr] || {};
-        const obj = {
-            action: selected.value,
-            text: selected.text,
-            timestamp: orig.timestamp || Date.now()
-        };
-
-        if (
-            (dirStr in actions) &&
-            (
-                !isEdit ||
-                dirStr !== origDirs
-            )
-        ) {
-            if (save = confirm("该手势已存在，是否要替换？")) {
-                actions[dirStr] = obj;
+            if (Math.abs(disX) > Math.abs(disY)) {
+                dir = x > start.x ? "r" : "l";
+            } else {
+                dir = y > start.y ? "d" : "u"
             }
-        } {
-            actions[dirStr] = obj;
+
+            if (len < 5 && dir !== dirs[len - 1]) {
+                dirs.push(dir);
+                updateGesture(dir);
+            }
+
+            start.x = x;
+            start.y = y;
         }
 
-        if (save) {
-            setOptions(opts, () => {
-                gestureSettings.initGestureView(actions);
-                gestureSettings.hideGestureDialog();
-            });
-        }
-    });
-});
-
-list.addEventListener("click", evt => {
-    const btn = evt.target as any;
-
-    if (btn.classList.contains("remove-gesture")) {
-        if (confirm("确定要删除该手势吗?")) {
-            getOptions().then((opts: any) => {
-                const {
-                    gesture: { actions = {} }
-                } = opts;
-
-                delete actions[btn.dirs];
-
-                setOptions(opts, () => {
-                    chrome.runtime.sendMessage({
-                        type: "updateGestures"
-                    });
-                });
-
-                btn.parentNode.parentNode.removeChild(btn.parentNode);
-            });
-        }
-    } else if (btn.classList.contains("edit-gesture")) {
-        gestureSettings.showGestureDialog();
-        gestureSettings.initGestureDialog(btn.fn, btn.dirs);
+        points.push(`${x - rect.left} ${y - rect.top}`);
+        polyline.setAttribute("points", points.join(","));
     }
-});
+);
+
+saveGesture.addEventListener(
+    "click",
+    () => {
+        const selected = fnsEl.selectedOptions[0];
+        const dirStr = dirs.join("");
+
+        if (!selected || !selected.value) {
+            return alert("请选择手势功能！");
+        }
+
+        if (!dirStr) {
+            return alert("请绘制手势");
+        }
+
+        getOptions().then(
+            (opts: any) => {
+                const {
+                    gesture: {actions = {}}
+                } = opts;
+                let save = true;
+                const orig = actions[dirStr] || {};
+                const obj = {
+                    action: selected.value,
+                    text: selected.text,
+                    timestamp: orig.timestamp || Date.now()
+                };
+
+                if (
+                    (dirStr in actions) &&
+                    (
+                        !isEdit ||
+                        dirStr !== origDirs
+                    )
+                ) {
+                    if (save = confirm("该手势已存在，是否要替换？")) {
+                        actions[dirStr] = obj;
+                    }
+                } else {
+                    actions[dirStr] = obj;
+                }
+
+                if (save) {
+                    setOptions(opts, () => {
+                        gestureSettings.initGestureView(actions);
+                        gestureSettings.hideGestureDialog();
+                    });
+                }
+            }
+        );
+    }
+);
+
+list.addEventListener(
+    "click",
+    evt => {
+        const btn = evt.target as any;
+
+        if (btn.classList.contains("remove-gesture")) {
+            if (confirm("确定要删除该手势吗?")) {
+                getOptions().then((opts: any) => {
+                    const {
+                        gesture: {actions = {}}
+                    } = opts;
+
+                    delete actions[btn.dirs];
+
+                    setOptions(opts, () => {
+                        chrome.runtime.sendMessage({
+                            type: "updateGestures"
+                        });
+                    });
+
+                    btn.parentNode.parentNode.removeChild(btn.parentNode);
+                });
+            }
+        } else if (btn.classList.contains("edit-gesture")) {
+            gestureSettings.showGestureDialog();
+            gestureSettings.initGestureDialog(btn.fn, btn.dirs);
+        }
+    }
+);
 
 const gestureSettings = {
     initGestureView(gestures: any) {
