@@ -1,5 +1,5 @@
 import "../styles/newTab.scss";
-import { emulateTransitionEnd } from "./modules/utils";
+import {emulateTransitionEnd} from "./modules/utils";
 
 function request(url: string, responseType: XMLHttpRequestResponseType = "json") {
     return new Promise((resolve: Function, reject: Function) => {
@@ -190,28 +190,26 @@ function initTime() {
     loop();
 }
 
-(function () {
-    chrome.storage.local.get("backgroundImg", item => {
-        let bg = item.backgroundImg;
+chrome.storage.local.get("backgroundImg", item => {
+    let bg = item.backgroundImg;
 
-        if (bg && bg.date === getToday()) {
-            setBg(bg)
-        } else {
-            fetchImg();
-        }
-    });
+    if (bg && bg.date === getToday()) {
+        setBg(bg)
+    } else {
+        fetchImg();
+    }
+});
 
-    chrome.storage.local.get("dailySentence", item => {
-        let sentence = item.dailySentence;
+chrome.storage.local.get("dailySentence", item => {
+    let sentence = item.dailySentence;
 
-        if (sentence && sentence.date === getToday()) {
-            setSentence(sentence);
-        } else {
-            fetchSentence();
-        }
-    });
+    if (sentence && sentence.date === getToday()) {
+        setSentence(sentence);
+    } else {
+        fetchSentence();
+    }
+});
 
-    initEvent();
-    initDate();
-    initTime();
-})();
+initEvent();
+initDate();
+initTime();
